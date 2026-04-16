@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <main class="app">
+        <section class="todo">
+            <!-- Header -->
+            <header class="todo-header">
+                <h1>Todo List</h1>
+                <p>Công việc cần làm</p>
+            </header>
+
+            <!-- Progress -->
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span>0% hoàn thành</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Thống kê -->
+            <div class="stats">
+                <div class="card">Tổng: <span id="total">0</span></div>
+                <div class="card">Done: <span id="done">0</span></div>
+                <div class="card">Pending: <span id="pending">0</span></div>
+            </div>
+
+            <!-- Search -->
+            <input type="text" id="search" placeholder="Tìm kiếm...">
+            
+            <!-- Filter -->
+             <div class="filter">
+                <button data-filter="all">Tất cả</button>
+                <button data-filter="completed">Đã hoàn thành</button>
+                <button data-filter="pending">Chưa hoàn thành</button>
+             </div>
+            
+            <!-- Input -->
+            <form class="todo-form">
+                <input type="text" id="todo-input" placeholder="Công việc ngày hôm nay?">
+                <button type="submit" id="add-btn">Thêm</button>
+            </form>
+
+            <!-- Todo List -->
+            <ul class="todo-list" id="todo-list"></ul>
+            <p id="empty-state">Chưa có công việc nào</p>
+
+        </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
