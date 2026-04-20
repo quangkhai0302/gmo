@@ -2,19 +2,21 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 import PrimeVue from 'primevue/config'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
-import Card from 'primevue/card'
+import Aura from '@primeuix/themes/aura'
+
+// CSS
+import 'primeicons/primeicons.css'
+import './assets/auth.css'
 
 const app = createApp(App)
 
-app.use(PrimeVue)
-
-// register component
-app.component('InputText', InputText)
-app.component('Password', Password)
-app.component('Button', Button)
-app.component('Card', Card)
+app.use(PrimeVue, {
+	theme: {
+		preset: Aura,
+		options: {
+			darkModeSelector: false
+		}
+	}
+})
 
 app.mount('#app')
