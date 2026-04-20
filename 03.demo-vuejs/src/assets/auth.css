@@ -1,0 +1,56 @@
+.wrapper {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: linear-gradient(135deg, #eef2ff, #f8fafc);
+}
+
+.auth-card {
+	width: 400px;
+	border-radius: 18px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.input-row {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.input-row i {
+	color: #6b7280;
+	font-size: 1rem;
+}
+
+.input-field {
+	flex: 1;
+}
+
+.input-field .p-inputtext {
+	width: 100%;
+}
+
+.input-field .p-password {
+	width: 100%;
+}
+
+.input-field .p-password-input {
+	width: 100%;
+}
+
+.title {
+	text-align: center;
+	margin: 0;
+}
+
+.subtitle {
+	text-align: center;
+	color: #6b7280;
+}
