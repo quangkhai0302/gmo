@@ -1,62 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo List</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Todo Auth</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
     <main class="app">
-        <section class="todo">
-            <!-- Header -->
-            <header class="todo-header">
-                <h1>Todo List</h1>
-                <p>Công việc cần làm</p>
-            </header>
-
-            <!-- Progress -->
-            <div class="progress-container">
-                <div class="progress-info">
-                    <span>0% hoàn thành</span>
+        <section class="auth-card">
+            <div class="auth-visual">
+                <div class="brand">
+                    <div class="brand-badge">T</div>
+                    Todo App
                 </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
+                <h1>Quản lý công việc thông minh, mọi lúc mọi nơi</h1>
+                <p>Tập trung vào việc cần làm quan trọng. Đăng nhập để đồng bộ và theo dõi tiến độ.</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-dot"></span>
+                        Nhắc nhở công việc theo ngày
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-dot"></span>
+                        Tự động thống kê tiến độ
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-dot"></span>
+                        Giao diện gọn gàng, dễ dùng
+                    </div>
                 </div>
             </div>
 
-            <!-- Thống kê -->
-            <div class="stats">
-                <div class="card">Tổng: <span id="total">0</span></div>
-                <div class="card">Done: <span id="done">0</span></div>
-                <div class="card">Pending: <span id="pending">0</span></div>
+            <div class="auth-panel">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" type="button" data-mode="login">Đăng nhập</button>
+                    <button class="auth-tab" type="button" data-mode="register">Đăng ký</button>
+                </div>
+
+                <div>
+                    <h2 class="auth-title" id="auth-mode-label">Đăng nhập</h2>
+                    <p class="auth-subtitle">Chào mừng bạn quay trở lại. Hãy tiếp tục công việc hôm nay.</p>
+                </div>
+
+                <form class="auth-form" data-mode="login">
+                    <div class="form-field">
+                        <label for="login-email">Email</label>
+                        <input id="login-email" name="email" type="email" placeholder="ban@company.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="login-password">Mật khẩu</label>
+                        <input id="login-password" name="password" type="password" placeholder="Nhập mật khẩu" required>
+                    </div>
+                    <div class="auth-row">
+                        <label>
+                            <input type="checkbox" name="remember"> Ghi nhớ đăng nhập
+                        </label>
+                        <a href="#">Quên mật khẩu?</a>
+                    </div>
+                    <div class="auth-actions">
+                        <button class="primary-btn" type="submit">Đăng nhập</button>
+                        <button class="secondary-btn" type="button">Đăng nhập bằng Google</button>
+                    </div>
+                </form>
+
+                <form class="auth-form hidden" data-mode="register">
+                    <div class="form-field">
+                        <label for="register-name">Họ và tên</label>
+                        <input id="register-name" name="fullName" type="text" placeholder="Nguyen Van A" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="register-email">Email</label>
+                        <input id="register-email" name="email" type="email" placeholder="ban@company.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="register-password">Mật khẩu</label>
+                        <input id="register-password" name="password" type="password" placeholder="Nhập mật khẩu" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="register-confirm">Xác nhận mật khẩu</label>
+                        <input id="register-confirm" name="confirmPassword" type="password" placeholder="Nhập lại mật khẩu" required>
+                    </div>
+                    <div class="auth-actions">
+                        <button class="primary-btn" type="submit">Tạo tài khoản</button>
+                        <button class="secondary-btn" type="button">Đăng ký bằng Google</button>
+                    </div>
+                </form>
+
+                <div class="auth-status" id="auth-status">Sẵn sàng kết nối API khi backend hoàn tất.</div>
+
+                <div class="auth-footer">
+                    Chưa có tài khoản?
+                    <button class="swap-mode" type="button" data-target="register">Tạo tài khoản</button>
+                    . Đã có tài khoản?
+                    <button class="swap-mode" type="button" data-target="login">Đăng nhập ngay</button>
+                </div>
             </div>
-
-            <!-- Search -->
-            <input type="text" id="search" placeholder="Tìm kiếm...">
-            
-            <!-- Filter -->
-             <div class="filter">
-                <button data-filter="all">Tất cả</button>
-                <button data-filter="completed">Đã hoàn thành</button>
-                <button data-filter="pending">Chưa hoàn thành</button>
-             </div>
-            
-            <!-- Input -->
-            <form class="todo-form">
-                <input type="text" id="todo-input" placeholder="Công việc ngày hôm nay?">
-                <button type="submit" id="add-btn">Thêm</button>
-            </form>
-
-            <!-- Todo List -->
-            <ul class="todo-list" id="todo-list"></ul>
-            <p id="empty-state">Chưa có công việc nào</p>
-
         </section>
     </main>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="main.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
