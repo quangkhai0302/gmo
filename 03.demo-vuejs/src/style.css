@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  background-attachment: fixed;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
+}
+
+/* ── PrimeVue InputText — đồng bộ với auth-input ── */
+.p-inputtext {
+  width: 100%;
+  padding: 12px 14px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 12px !important;
+  outline: none !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  background: #f9fafb !important;
+  color: #111827 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.p-inputtext::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.65 !important;
+}
+
+.p-inputtext:focus,
+.p-inputtext:enabled:focus {
+  background: #ffffff !important;
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+  outline: none !important;
+}
