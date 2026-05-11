@@ -8,18 +8,8 @@
           id="search-student-code"
           v-model="form.code"
           placeholder="Enter Student Code"
-          :maxlength="10"
-          :class="['sl-field__input', { 'sl-field__input--error': errors.code }]"
-          @input="validateCode"
+          class="sl-field__input"
         />
-        <transition name="sl-err">
-          <span v-if="errors.code" class="sl-field__error">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            {{ errors.code }}
-          </span>
-        </transition>
       </div>
 
       <!-- Student Name -->
@@ -29,18 +19,8 @@
           id="search-name"
           v-model="form.name"
           placeholder="Enter student name"
-          :maxlength="50"
-          :class="['sl-field__input', { 'sl-field__input--error': errors.name }]"
-          @input="validateName"
+          class="sl-field__input"
         />
-        <transition name="sl-err">
-          <span v-if="errors.name" class="sl-field__error">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            {{ errors.name }}
-          </span>
-        </transition>
       </div>
 
       <!-- Birthday -->
@@ -50,18 +30,8 @@
           id="search-birthday"
           v-model="form.birthday"
           placeholder="YYYY/MM/DD"
-          :class="['sl-field__input', { 'sl-field__input--error': errors.birthday }]"
-          @blur="validateBirthday"
-          @input="onBirthdayInput"
+          class="sl-field__input"
         />
-        <transition name="sl-err">
-          <span v-if="errors.birthday" class="sl-field__error">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            {{ errors.birthday }}
-          </span>
-        </transition>
       </div>
 
       <!-- Search Button -->
@@ -85,35 +55,8 @@ import type { SearchForm } from '../../types/student'
 const emit = defineEmits<{ search: [form: SearchForm] }>()
 
 const form = reactive<SearchForm>({ code: '', name: '', birthday: '' })
-const errors = reactive({ code: '', name: '', birthday: '' })
-
-function isValidDate(dateStr: string): boolean {
-  if (!dateStr) return true
-  const re = /^\d{4}\/\d{2}\/\d{2}$/
-  if (!re.test(dateStr)) return false
-  const [y, m, d] = dateStr.split('/').map(Number)
-  const date = new Date(y, m - 1, d)
-  return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d
-}
-
-function validateCode() {
-  errors.code = form.code.length > 10 ? 'Mã sinh viên không được vượt quá 10 ký tự' : ''
-}
-function validateName() {
-  errors.name = form.name.length > 50 ? 'Họ tên không được vượt quá 50 ký tự' : ''
-}
-function validateBirthday() {
-  if (!form.birthday) { errors.birthday = ''; return }
-  errors.birthday = !isValidDate(form.birthday) ? 'Ngày sinh không hợp lệ (định dạng: YYYY/MM/DD)' : ''
-}
-function onBirthdayInput() { if (!form.birthday) errors.birthday = '' }
-
-function validateAll(): boolean {
-  validateCode(); validateName(); validateBirthday()
-  return !errors.code && !errors.name && !errors.birthday
-}
 function handleSearch() {
-  if (validateAll()) emit('search', { ...form })
+  emit('search', { ...form })
 }
 </script>
 
@@ -177,21 +120,6 @@ function handleSearch() {
   border-color: #4f46e5 !important;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
 }
-.sl-field__input--error {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
-}
-
-.sl-field__error {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.76rem;
-  color: #ef4444;
-  font-weight: 500;
-  min-height: 18px;
-}
-
 /* Button — khớp với btn-login */
 .sl-btn-search {
   display: inline-flex;
@@ -216,6 +144,4 @@ function handleSearch() {
 }
 .sl-btn-search:active { transform: scale(0.98); }
 
-.sl-err-enter-active, .sl-err-leave-active { transition: all 0.2s ease; }
-.sl-err-enter-from, .sl-err-leave-to { opacity: 0; transform: translateY(-3px); }
 </style>

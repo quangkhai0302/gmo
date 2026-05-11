@@ -23,15 +23,13 @@
 
       <!-- Student Code -->
       <div class="sd-field">
-        <label for="studentCode">Student Code <span v-if="mode === 'add'" class="required">*</span></label>
+        <label for="studentCode">Student Code</label>
         <div class="sd-input-with-action">
           <InputText
             id="studentCode"
             v-model="formData.studentCode"
             disabled
-            maxlength="10"
             class="sd-input w-full font-mono"
-            :invalid="!!errors.studentCode"
             placeholder="e.g. STU12345"
           />
           <Button
@@ -50,34 +48,28 @@
             </template>
           </Button>
         </div>
-        <small v-if="errors.studentCode" class="p-error">{{ errors.studentCode }}</small>
       </div>
 
       <!-- Student Name -->
       <div class="sd-field">
-        <label for="studentName">Student Name <span class="required">*</span></label>
+        <label for="studentName">Student Name</label>
         <InputText
           id="studentName"
           v-model="formData.studentName"
-          maxlength="20"
-          :invalid="!!errors.studentName"
           placeholder="Enter student name"
           class="sd-input"
         />
-        <small v-if="errors.studentName" class="p-error">{{ errors.studentName }}</small>
       </div>
 
       <!-- Birthday -->
       <div class="sd-field">
-        <label for="birthday">Birthday <span class="required">*</span></label>
+        <label for="birthday">Birthday</label>
         <input
           id="birthday"
           type="date"
           v-model="formData.birthday"
-          :max="todayStr"
-          :class="['sd-native-date', { 'sd-native-date--error': !!errors.birthday }]"
+          class="sd-native-date"
         />
-        <small v-if="errors.birthday" class="p-error">{{ errors.birthday }}</small>
       </div>
 
       <!-- Address -->
@@ -86,12 +78,9 @@
         <InputText
           id="address"
           v-model="formData.address"
-          maxlength="255"
-          :invalid="!!errors.address"
           placeholder="Enter student address (optional)"
           class="sd-input"
         />
-        <small v-if="errors.address" class="p-error">{{ errors.address }}</small>
       </div>
 
       <!-- Average Score -->
@@ -102,17 +91,13 @@
             id="averageScore"
             type="number"
             step="0.1"
-            min="0"
-            max="10"
-            :invalid="!!errors.averageScore"
             placeholder="0.0 - 10.0"
             class="sd-input"
           />
-          <div class="sd-score-indicator" v-if="formData.averageScore !== null && formData.averageScore !== '' && !errors.averageScore">
+          <div class="sd-score-indicator" v-if="formData.averageScore !== null && formData.averageScore !== ''">
             <span :class="scoreClass(Number(formData.averageScore))">{{ Number(formData.averageScore).toFixed(1) }}</span>
           </div>
         </div>
-        <small v-if="errors.averageScore" class="p-error">{{ errors.averageScore }}</small>
       </div>
 
       <div class="sd-form-divider"></div>
@@ -139,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, computed } from 'vue'
+import { reactive, watch } from 'vue'
 
 const props = defineProps<{
   mode: 'add' | 'edit'
@@ -147,12 +132,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['save', 'back'])
-
-// Today string for max date on native input
-const todayStr = computed(() => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-})
 
 const formData = reactive({
   studentId: null as number | null,
@@ -162,8 +141,6 @@ const formData = reactive({
   address: '',
   averageScore: null as number | string | null
 })
-
-const errors = reactive<Record<string, string>>({})
 
 watch(() => props.initialData, (newVal) => {
   if (newVal && props.mode === 'edit') {
@@ -177,9 +154,7 @@ watch(() => props.initialData, (newVal) => {
 }, { immediate: true })
 
 function generateCode() {
-  const random = Math.floor(Math.random() * 90000) + 10000
-  formData.studentCode = `STU${random}`
-  delete errors.studentCode
+  // Student code generation is handled outside frontend.
 }
 
 function scoreClass(score: number) {
@@ -189,71 +164,17 @@ function scoreClass(score: number) {
   return 'sd-score--poor'
 }
 
-function validate() {
-  let isValid = true
-  Object.keys(errors).forEach(k => delete errors[k])
-
-  // Student Code Rule
-  if (props.mode === 'add' && (!formData.studentCode || formData.studentCode.trim() === '')) {
-    errors.studentCode = 'Student code is required. Please compute a generated code.'
-    isValid = false
-  }
-
-  // Student Name Rule
-  if (!formData.studentName || formData.studentName.trim() === '') {
-    errors.studentName = 'Student name is required.'
-    isValid = false
-  } else if (formData.studentName.length > 20) {
-    errors.studentName = 'Maximum length is 20 characters.'
-    isValid = false
-  }
-
-  // Birthday Rule
-  if (!formData.birthday || formData.birthday.trim() === '') {
-    errors.birthday = 'Birthday is required.'
-    isValid = false
-  } else {
-    const bdayObj = new Date(formData.birthday)
-    if (isNaN(bdayObj.getTime())) {
-      errors.birthday = 'Invalid date format.'
-      isValid = false
-    } else if (formData.birthday > todayStr.value) {
-      errors.birthday = 'Birthday cannot be in the future.'
-      isValid = false
-    }
-  }
-
-  // Address Rule
-  if (formData.address && formData.address.length > 255) {
-    errors.address = 'Maximum length is 255 characters.'
-    isValid = false
-  }
-
-  // Average Score Rule
-  if (formData.averageScore !== null && formData.averageScore !== '') {
-    const score = Number(formData.averageScore)
-    if (isNaN(score) || score < 0 || score > 10) {
-      errors.averageScore = 'Score must be a number between 0 and 10.'
-      isValid = false
-    }
-  }
-
-  return isValid
-}
-
 function submitForm() {
-  if (validate()) {
-    const submitData = { ...formData }
-    
-    // Format numeric conversions
-    if (submitData.averageScore !== null && submitData.averageScore !== '') {
-      submitData.averageScore = Number(submitData.averageScore)
-    } else {
-      submitData.averageScore = null
-    }
-
-    emit('save', submitData)
+  const submitData = { ...formData }
+  
+  // Format numeric conversions
+  if (submitData.averageScore !== null && submitData.averageScore !== '') {
+    submitData.averageScore = Number(submitData.averageScore)
+  } else {
+    submitData.averageScore = null
   }
+
+  emit('save', submitData)
 }
 </script>
 
@@ -304,11 +225,6 @@ function submitForm() {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.required {
-  color: #ef4444;
-  font-weight: black;
 }
 
 /* Base input overrides */
@@ -427,13 +343,6 @@ function submitForm() {
 .sd-score--average   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 .sd-score--poor      { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-.p-error {
-  color: #ef4444;
-  font-size: 0.8rem;
-  font-weight: 500;
-  margin-top: 4px;
-}
-
 .sd-form-divider {
   height: 1px;
   background-color: #e5e7eb;
@@ -509,15 +418,6 @@ function submitForm() {
 
 .sd-native-date:hover {
   border-color: #d1d5db;
-}
-
-.sd-native-date--error {
-  border-color: #ef4444;
-}
-
-.sd-native-date--error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
 .sd-native-date::-webkit-calendar-picker-indicator {
