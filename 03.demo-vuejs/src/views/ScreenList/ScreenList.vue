@@ -1,6 +1,6 @@
 <template>
   <div class="sl-screen">
-    <AppHeader username="Admin" @logout="handleLogout" />
+    <AppHeader username="Admin" />
 
     <main class="sl-main">
       <div class="sl-container">
@@ -59,8 +59,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 import AppHeader         from '../../components/screenList/Header.vue'
 import SearchForm        from '../../components/screenList/SearchForm.vue'
@@ -69,51 +70,70 @@ import Pagination        from '../../components/screenList/Pagination.vue'
 import ConfirmDialog     from '../../components/screenList/ConfirmDialog.vue'
 import ToastNotification from '../../components/screenList/ToastNotification.vue'
 
-import { mockStudents }  from '../../data/mockStudents'
-import type { Student, SearchForm as ISearchForm, SortState } from '../../types/student'
+import { deleteStudentApi, getStudentsApi } from '@/api/axios'
+import type { Student, SearchForm as ISearchForm, SortState, StudentSortField } from '../../types/student'
 
 const PAGE_SIZE = 10
 const router = useRouter()
 
-const students    = ref<Student[]>([...mockStudents])
+const students    = ref<Student[]>([])
 const currentPage = ref(1)
+const filteredTotal = ref(0)
 const toast       = ref<InstanceType<typeof ToastNotification> | null>(null)
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
 const sortState      = reactive<SortState>({ field: null, order: null })
-const dialog         = reactive({ visible: false, code: '', studentName: '' })
+const dialog         = reactive({ visible: false, studentId: 0, studentName: '' })
 
-const filteredStudents = computed(() => {
-  const sid  = searchCriteria.code.trim().toLowerCase()
-  const name = searchCriteria.name.trim().toLowerCase()
-  const bday = searchCriteria.birthday.trim()
-  return students.value.filter(s => {
-    if (sid  && !s.code.toLowerCase().includes(sid))  return false
-    if (name && !s.name.toLowerCase().includes(name))       return false
-    if (bday && s.birthday !== bday)                        return false
-    return true
-  })
-})
-
-const sortedStudents = computed(() => {
-  const list = [...filteredStudents.value]
-  const { field, order } = sortState
-  if (!field || !order) return list
-  return list.sort((a, b) => {
-    const av = a[field], bv = b[field]
-    if (av < bv) return order === 'asc' ? -1 : 1
-    if (av > bv) return order === 'asc' ?  1 : -1
-    return 0
-  })
-})
-
-const filteredTotal = computed(() => sortedStudents.value.length)
 const startIndex    = computed(() => (currentPage.value - 1) * PAGE_SIZE)
-const pagedStudents = computed(() => sortedStudents.value.slice(startIndex.value, startIndex.value + PAGE_SIZE))
+const pagedStudents = computed(() => students.value)
 
-function handleSearch(form: ISearchForm) { Object.assign(searchCriteria, form); currentPage.value = 1 }
+interface ApiErrorResponse {
+  message?: string
+  errors?: Record<string, string> | null
+}
 
-function handleSort(field: keyof Student) {
+function getErrorMessage(error: unknown, fallback: string) {
+  if (!axios.isAxiosError(error)) return fallback
+  const data = error.response?.data as ApiErrorResponse | undefined
+  const firstFieldError = data?.errors ? Object.values(data.errors)[0] : undefined
+  return firstFieldError ?? data?.message ?? fallback
+}
+
+async function fetchStudents(page = currentPage.value) {
+  const response = await getStudentsApi({
+    studentCode: searchCriteria.code.trim() || undefined,
+    studentName: searchCriteria.name.trim() || undefined,
+    birthday: searchCriteria.birthday.trim() || undefined,
+    page,
+    size: PAGE_SIZE,
+    sortField: sortState.field ?? undefined,
+    sortOrder: sortState.order ?? undefined,
+  })
+
+  students.value = response.result.items
+  currentPage.value = response.result.page
+  filteredTotal.value = response.result.totalItems
+}
+
+onMounted(async () => {
+  try {
+    await fetchStudents(1)
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Không thể tải danh sách sinh viên'), 'error')
+  }
+})
+
+async function handleSearch(form: ISearchForm) {
+  try {
+    Object.assign(searchCriteria, form)
+    await fetchStudents(1)
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Tìm kiếm thất bại'), 'error')
+  }
+}
+
+async function handleSort(field: StudentSortField) {
   if (sortState.field === field) {
     if      (sortState.order === 'asc')  { sortState.order = 'desc' }
     else if (sortState.order === 'desc') { sortState.field = null; sortState.order = null }
@@ -121,42 +141,52 @@ function handleSort(field: keyof Student) {
   } else {
     sortState.field = field; sortState.order = 'asc'
   }
-  currentPage.value = 1
+
+  try {
+    await fetchStudents(1)
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Sắp xếp thất bại'), 'error')
+  }
 }
 
-function handlePageChange(page: number) {
-  currentPage.value = page
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+async function handlePageChange(page: number) {
+  try {
+    await fetchStudents(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Không thể chuyển trang'), 'error')
+  }
 }
 
 function openDeleteDialog(student: Student) {
-  dialog.code = student.code; dialog.studentName = student.name; dialog.visible = true
+  dialog.studentId = student.id
+  dialog.studentName = student.name
+  dialog.visible = true
 }
 
-function handleConfirmDelete() {
-  const idx = students.value.findIndex(s => s.code === dialog.code)
-  if (idx !== -1) {
-    students.value.splice(idx, 1)
-    const maxPage = Math.max(1, Math.ceil(filteredTotal.value / PAGE_SIZE))
-    if (currentPage.value > maxPage) currentPage.value = maxPage
+async function handleConfirmDelete() {
+  try {
+    await deleteStudentApi(dialog.studentId)
+
+    const expectedTotal = Math.max(0, filteredTotal.value - 1)
+    const maxPageAfterDelete = Math.max(1, Math.ceil(expectedTotal / PAGE_SIZE))
+    const targetPage = Math.min(currentPage.value, maxPageAfterDelete)
+
+    await fetchStudents(targetPage)
+    toast.value?.show(`Đã xóa sinh viên "${dialog.studentName}" thành công`, 'success')
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Xóa sinh viên thất bại'), 'error')
+  } finally {
+    dialog.visible = false
   }
-  dialog.visible = false
-  toast.value?.show(`Đã xóa sinh viên "${dialog.studentName}" thành công`, 'success')
-}
-
-function handleLogout() {
-  router.push('/login')
 }
 
 function handleAddStudent() {
   router.push('/students/new')
 }
 
-function handleRequestEdit(code: string) {
-  const student = students.value.find(s => s.code === code)
-  if (student) {
-    router.push(`/students/${student.id}/edit`)
-  }
+function handleRequestEdit(id: number) {
+  router.push(`/students/${id}/edit`)
 }
 </script>
 

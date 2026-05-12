@@ -2,7 +2,7 @@ export interface Student {
   id: number
   code: string
   name: string
-  birthday: string // format: YYYY/MM/DD
+  birthday: string 
   address: string
   score: number
 }
@@ -13,7 +13,9 @@ export interface SearchForm {
   birthday: string
 }
 
+export type StudentSortField = 'id' | 'code' | 'name' | 'birthday' | 'score'
+
 export interface SortState {
-  field: keyof Student | null
+  field: StudentSortField | null
   order: 'asc' | 'desc' | null
 }

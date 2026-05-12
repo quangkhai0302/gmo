@@ -35,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import router from '@/router';
+import { tokenStorage } from '@/utils/tokenStorage';
 import { computed } from 'vue'
 
 const props = withDefaults(defineProps<{ username?: string; showUsername?: boolean }>(), { username: 'Admin', showUsername: true })
@@ -44,8 +46,9 @@ const initials = computed(() =>
   props.username.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 )
 
-function handleLogout() {
-  emit('logout')
+const handleLogout = async () => {
+  await tokenStorage.logout();
+  router.push('/login');
 }
 </script>
 

@@ -90,6 +90,7 @@
           <InputText
             id="averageScore"
             type="number"
+            v-model="formData.averageScore"
             step="0.1"
             placeholder="0.0 - 10.0"
             class="sd-input"
@@ -126,14 +127,27 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
 
+export interface StudentFormData {
+  studentId: number | null
+  studentCode: string
+  studentName: string
+  birthday: string
+  address: string
+  averageScore: number | string | null
+}
+
 const props = defineProps<{
   mode: 'add' | 'edit'
-  initialData: any
+  initialData: Partial<StudentFormData> | null
 }>()
 
-const emit = defineEmits(['save', 'back'])
+const emit = defineEmits<{
+  save: [data: StudentFormData]
+  back: []
+  generateCode: []
+}>()
 
-const formData = reactive({
+const formData = reactive<StudentFormData>({
   studentId: null as number | null,
   studentCode: '',
   studentName: '',
@@ -143,18 +157,17 @@ const formData = reactive({
 })
 
 watch(() => props.initialData, (newVal) => {
-  if (newVal && props.mode === 'edit') {
-    formData.studentId = newVal.studentId
-    formData.studentCode = newVal.studentCode
-    formData.studentName = newVal.studentName
-    formData.birthday = newVal.birthday || ''
-    formData.address = newVal.address || ''
-    formData.averageScore = newVal.averageScore ?? null
-  }
+  if (!newVal) return
+  formData.studentId = newVal.studentId ?? formData.studentId
+  formData.studentCode = newVal.studentCode ?? formData.studentCode
+  formData.studentName = newVal.studentName ?? formData.studentName
+  formData.birthday = newVal.birthday ?? formData.birthday
+  formData.address = newVal.address ?? formData.address
+  formData.averageScore = newVal.averageScore ?? formData.averageScore
 }, { immediate: true })
 
 function generateCode() {
-  // Student code generation is handled outside frontend.
+  emit('generateCode')
 }
 
 function scoreClass(score: number) {
@@ -176,6 +189,12 @@ function submitForm() {
 
   emit('save', submitData)
 }
+
+function setStudentCode(code: string) {
+  formData.studentCode = code
+}
+
+defineExpose({ setStudentCode })
 </script>
 
 <style scoped>

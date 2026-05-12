@@ -49,7 +49,7 @@
                 </span>
               </td>
               <td class="sl-td sl-td--actions">
-                <button class="sl-action sl-action--edit" @click="handleEdit(student.code)">
+                <button class="sl-action sl-action--edit" @click="handleEdit(student.id)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Student, SortState } from '../../types/student'
+import type { Student, SortState, StudentSortField } from '../../types/student'
 import SortIcon from '../../components/screenList/SortIcon.vue'
 
 const props = defineProps<{
@@ -99,13 +99,13 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  sort: [field: keyof Student]
-  requestEdit: [code: string]
+  sort: [field: StudentSortField]
+  requestEdit: [id: number]
   requestDelete: [student: Student]
 }>()
 
-function emitSort(field: keyof Student) { emit('sort', field) }
-function handleEdit(code: string) { emit('requestEdit', code) }
+function emitSort(field: StudentSortField) { emit('sort', field) }
+function handleEdit(id: number) { emit('requestEdit', id) }
 function handleDelete(student: Student) { emit('requestDelete', student) }
 
 function scoreClass(score: number) {

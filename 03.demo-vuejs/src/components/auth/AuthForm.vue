@@ -13,6 +13,8 @@ type NewType = {
     // content
     title: string
     subtitle?: string
+    errorSummary?: string
+    fieldErrors?: Record<string, string>
 
     // data
     fields: AuthField[]
@@ -55,27 +57,34 @@ const updateField = (key: string, value?: string) => {
     <div :class="containerClass">
       <h2 class="title">{{ title }}</h2>
       <p class="subtitle">{{ subtitle }}</p>
+      <div v-if="errorSummary" class="auth-error-box" role="alert">
+        <p v-if="errorSummary" class="auth-error-summary">{{ errorSummary }}</p>
+      </div>
 
       <template v-for="field in fields" :key="field.key">
-        <Password
-          v-if="field.type === 'password'"
-          :modelValue="modelValue[field.key] ?? ''"
-          :placeholder="field.placeholder"
-          :feedback="false"
-          :toggleMask="false"
-          inputClass="auth-input"
-          class="auth-password"
-          @update:modelValue="updateField(field.key, $event)"
-        />
+        <div class="auth-field">
+          <Password
+            v-if="field.type === 'password'"
+            :modelValue="modelValue[field.key] ?? ''"
+            :placeholder="field.placeholder"
+            :feedback="false"
+            :toggleMask="false"
+            :inputClass="['auth-input', { 'auth-input--invalid': !!fieldErrors?.[field.key] }]"
+            class="auth-password"
+            @update:modelValue="updateField(field.key, $event)"
+          />
 
-        <InputText
-          v-else
-          :modelValue="modelValue[field.key] ?? ''"
-          :type="field.type ?? 'text'"
-          :placeholder="field.placeholder"
-          class="auth-input"
-          @update:modelValue="updateField(field.key, $event)"
-        />
+          <InputText
+            v-else
+            :modelValue="modelValue[field.key] ?? ''"
+            :type="field.type ?? 'text'"
+            :placeholder="field.placeholder"
+            :class="['auth-input', { 'auth-input--invalid': !!fieldErrors?.[field.key] }]"
+            @update:modelValue="updateField(field.key, $event)"
+          />
+
+          <p v-if="fieldErrors?.[field.key]" class="auth-field-error">{{ fieldErrors[field.key] }}</p>
+        </div>
       </template>
 
       <div :class="['actions-row', { 'actions-row-inline': actionsInline }]">
@@ -136,6 +145,33 @@ const updateField = (key: string, value?: string) => {
   color: #6b7280;
 }
 
+.auth-error-box {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.auth-error-summary {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field-error {
+  margin: 0;
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+}
+
 :deep(.p-inputtext.auth-input) {
     width: 100%;
     padding: 12px 14px;
@@ -154,6 +190,17 @@ const updateField = (key: string, value?: string) => {
     background: white;
     border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+:deep(.p-inputtext.auth-input.auth-input--invalid),
+.auth-password :deep(.p-password-input.auth-input.auth-input--invalid) {
+  border-color: #ef4444;
+  background: #fff1f2;
+}
+
+:deep(.p-inputtext.auth-input.auth-input--invalid:enabled:focus),
+.auth-password :deep(.p-password-input.auth-input.auth-input--invalid:enabled:focus) {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
 }
 
 
