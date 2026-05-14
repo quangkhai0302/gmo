@@ -9,17 +9,16 @@
         <div class="sl-table-card">
           <div class="sl-table-card__header">
             <div class="sl-table-card__title">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-              </svg>
+              <i class="pi pi-th-large"></i>
               Student List
             </div>
             <div class="sl-table-actions">
+              <button class="sl-export-btn" :disabled="exportingCsv" @click="handleExportCsv">
+                <i class="pi pi-download"></i>
+                {{ exportingCsv ? 'Exporting...' : 'Export CSV' }}
+              </button>
               <button class="sl-add-btn" @click="handleAddStudent">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
+                <i class="pi pi-plus"></i>
                 Add Student
               </button>
             </div>
@@ -58,7 +57,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { deleteStudentApi, getStudentsApi } from '@/api/axios'
+import { deleteStudentApi, getStudentsApi, runStudentExportBatchApi } from '@/api/axios'
 import { parseApiError } from '@/utils/apiError'
 import type { SearchForm as ISearchForm, SortState, Student, StudentSortField } from '../../types/student'
 import AppHeader from '../../components/screenList/Header.vue'
@@ -76,6 +75,7 @@ const students = ref<Student[]>([])
 const currentPage = ref(1)
 const filteredTotal = ref(0)
 const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
+const exportingCsv = ref(false)
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
 const sortState = reactive<SortState>({ field: null, order: null })
@@ -184,6 +184,23 @@ function handleRequestEdit(id: number) {
   router.push(`/students/${id}/edit`)
 }
 
+async function handleExportCsv() {
+  if (exportingCsv.value) {
+    return
+  }
+
+  try {
+    exportingCsv.value = true
+    const response = await runStudentExportBatchApi()
+    const fileName = extractFileName(response.result.outputFile)
+    toast.value?.show(`Xuất CSV thành công: ${fileName}`, 'success')
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Xuất CSV thất bại'), 'error')
+  } finally {
+    exportingCsv.value = false
+  }
+}
+
 function showToastFromRouteQuery() {
   if (route.query.toast === 'created') {
     toast.value?.show('Tạo sinh viên thành công', 'success')
@@ -195,6 +212,17 @@ function showToastFromRouteQuery() {
     toast.value?.show('Cập nhật sinh viên thành công', 'success')
     router.replace('/students')
   }
+}
+
+function extractFileName(path: string) {
+  if (!path) {
+    return 'student_export.csv'
+  }
+
+  const normalized = path.replace(/\\/g, '/')
+  const parts = normalized.split('/')
+  const fileName = parts[parts.length - 1]
+  return fileName || 'student_export.csv'
 }
 </script>
 
@@ -236,7 +264,7 @@ function showToastFromRouteQuery() {
   color: #374151;
 }
 
-.sl-table-card__title svg {
+.sl-table-card__title i {
   color: #4f46e5;
 }
 
@@ -267,6 +295,31 @@ function showToastFromRouteQuery() {
   box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
 }
 
+.sl-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sl-export-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.2);
+}
+
+.sl-export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .sl-result-badge {
   display: inline-flex;
   align-items: center;
@@ -279,4 +332,3 @@ function showToastFromRouteQuery() {
   color: #4f46e5;
 }
 </style>
-

@@ -89,6 +89,12 @@ export interface StudentUpdateRequest {
     averageScore?: number | null;
 }
 
+export interface StudentExportRunResponse {
+    jobExecutionId: number;
+    status: string;
+    outputFile: string;
+}
+
 
 export const registerApi = async (data: RegisterRequest): Promise<ApiResponse<AuthTokenResponse>> => {
     const response = await api.post('/api/auth/register', data);
@@ -150,5 +156,10 @@ export const updateStudentApi = async (
 
 export const deleteStudentApi = async (studentId: number): Promise<ApiResponse<string>> => {
     const response = await api.delete(`/api/students/${studentId}`);
+    return response.data;
+}
+
+export const runStudentExportBatchApi = async (): Promise<ApiResponse<StudentExportRunResponse>> => {
+    const response = await api.post('/batch/export-students/run');
     return response.data;
 }

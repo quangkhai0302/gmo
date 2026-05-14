@@ -8,6 +8,7 @@ import Button from 'primevue/button'
 import router from './router'
 
 import './style.css'
+import 'primeicons/primeicons.css'
 
 const app = createApp(App).use(router)
 

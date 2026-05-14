@@ -37,9 +37,7 @@
       <!-- Search Button -->
       <div class="sl-field sl-field--btn">
         <button class="sl-btn-search" @click="handleSearch">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <i class="pi pi-search"></i>
           Search
         </button>
       </div>

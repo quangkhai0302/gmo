@@ -1,14 +1,8 @@
 <template>
   <span class="sl-sort-icon">
-    <svg v-if="!isActive" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
-      <path d="M7 15l5 5 5-5M7 9l5-5 5 5"/>
-    </svg>
-    <svg v-else-if="sort.order === 'asc'" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5">
-      <path d="M12 19V5M5 12l7-7 7 7"/>
-    </svg>
-    <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5">
-      <path d="M12 5v14M5 12l7 7 7-7"/>
-    </svg>
+    <i v-if="!isActive" class="pi pi-sort-alt sl-sort-icon--inactive"></i>
+    <i v-else-if="sort.order === 'asc'" class="pi pi-sort-amount-up sl-sort-icon--active"></i>
+    <i v-else class="pi pi-sort-amount-down sl-sort-icon--active"></i>
   </span>
 </template>
 
@@ -28,5 +22,14 @@ const isActive = computed(
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.sl-sort-icon--inactive {
+  color: #9ca3af;
+}
+
+.sl-sort-icon--active {
+  color: #4f46e5;
 }
 </style>

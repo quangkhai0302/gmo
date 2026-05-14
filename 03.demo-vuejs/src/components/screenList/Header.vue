@@ -1,18 +1,8 @@
-<template>
+﻿<template>
   <header class="sl-header">
     <div class="sl-header__logo">
       <div class="sl-header__logo-icon">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="url(#hgrad)" />
-          <path d="M8 22L14 10L20 18L23 14L26 18" stroke="white" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round" />
-          <defs>
-            <linearGradient id="hgrad" x1="0" y1="0" x2="32" y2="32">
-              <stop offset="0%" stop-color="#4f46e5" />
-              <stop offset="100%" stop-color="#7c3aed" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <i class="pi pi-graduation-cap"></i>
       </div>
       <span class="sl-header__logo-text">StudentMS</span>
     </div>
@@ -23,11 +13,7 @@
         <span class="sl-header__username">Welcome, {{ username }}</span>
       </div>
       <button class="sl-header__logout" @click="handleLogout">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
+        <i class="pi pi-sign-out"></i>
         Logout
       </button>
     </div>
@@ -35,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/router';
-import { tokenStorage } from '@/utils/tokenStorage';
+import router from '@/router'
+import { tokenStorage } from '@/utils/tokenStorage'
 import { computed } from 'vue'
 
 const props = withDefaults(defineProps<{ username?: string; showUsername?: boolean }>(), { showUsername: true })
@@ -52,8 +38,8 @@ const initials = computed(() =>
 )
 
 const handleLogout = async () => {
-  await tokenStorage.logout();
-  router.push('/login');
+  await tokenStorage.logout()
+  router.push('/login')
 }
 </script>
 
@@ -76,6 +62,18 @@ const handleLogout = async () => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.sl-header__logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
 }
 
 .sl-header__logo-text {

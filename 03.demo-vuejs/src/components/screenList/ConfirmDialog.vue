@@ -1,15 +1,10 @@
-<template>
+﻿<template>
   <Teleport to="body">
     <Transition name="sl-dialog">
       <div v-if="visible" class="sl-dialog-overlay" @click.self="$emit('cancel')">
         <div class="sl-dialog" role="dialog" aria-modal="true">
           <div class="sl-dialog__icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6M14 11v6"/>
-              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
+            <i class="pi pi-trash"></i>
           </div>
           <h3 class="sl-dialog__title">Xác nhận xóa</h3>
           <p class="sl-dialog__message">
@@ -20,9 +15,7 @@
           <div class="sl-dialog__actions">
             <button class="sl-dialog__btn sl-dialog__btn--cancel" @click="$emit('cancel')">Hủy</button>
             <button class="sl-dialog__btn sl-dialog__btn--confirm" @click="$emit('confirm')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
+              <i class="pi pi-check"></i>
               Xác nhận xóa
             </button>
           </div>
@@ -71,6 +64,7 @@ defineEmits<{ confirm: []; cancel: [] }>()
   justify-content: center;
   margin: 0 auto 20px;
   color: #ef4444;
+  font-size: 1.2rem;
 }
 
 .sl-dialog__title {

@@ -3,15 +3,11 @@
     <div class="sl-pagination__controls">
       <button class="sl-page-btn sl-page-btn--nav" :disabled="currentPage === 1"
         @click="$emit('changePage', 1)" title="First page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
-        </svg>
+        <i class="pi pi-angle-double-left"></i>
       </button>
       <button class="sl-page-btn sl-page-btn--nav" :disabled="currentPage === 1"
         @click="$emit('changePage', currentPage - 1)" title="Previous page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
+        <i class="pi pi-angle-left"></i>
       </button>
 
       <template v-for="page in visiblePages" :key="page">
@@ -25,15 +21,11 @@
 
       <button class="sl-page-btn sl-page-btn--nav" :disabled="currentPage === totalPages"
         @click="$emit('changePage', currentPage + 1)" title="Next page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
+        <i class="pi pi-angle-right"></i>
       </button>
       <button class="sl-page-btn sl-page-btn--nav" :disabled="currentPage === totalPages"
         @click="$emit('changePage', totalPages)" title="Last page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
-        </svg>
+        <i class="pi pi-angle-double-right"></i>
       </button>
     </div>
   </div>

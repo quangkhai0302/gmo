@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="sl-table-wrapper">
     <div class="sl-table-scroll">
       <table class="sl-table">
@@ -50,19 +50,11 @@
               </td>
               <td class="sl-td sl-td--actions">
                 <button class="sl-action sl-action--edit" @click="handleEdit(student.id)">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
+                  <i class="pi pi-pencil"></i>
                   Edit
                 </button>
                 <button class="sl-action sl-action--delete" @click="handleDelete(student)">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6M14 11v6"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                  </svg>
+                  <i class="pi pi-trash"></i>
                   Delete
                 </button>
               </td>
@@ -73,9 +65,7 @@
             <td colspan="7" class="sl-empty">
               <div class="sl-empty__content">
                 <div class="sl-empty__icon">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
+                  <i class="pi pi-search"></i>
                 </div>
                 <p>Không có dữ liệu</p>
                 <span>Thử thay đổi điều kiện tìm kiếm</span>
@@ -151,7 +141,6 @@ function formatScore(score: number | null | undefined) {
   min-width: 780px;
 }
 
-/* Head */
 .sl-th {
   padding: 13px 16px;
   font-size: 0.72rem;
@@ -180,7 +169,6 @@ function formatScore(score: number | null | undefined) {
   justify-content: center;
 }
 
-/* Body */
 .sl-tr {
   border-bottom: 1px solid #f3f4f6;
   transition: background 0.12s;
@@ -203,13 +191,11 @@ function formatScore(score: number | null | undefined) {
   font-weight: 600;
 }
 
-/* Student name row */
 .sl-student-name {
   font-weight: 600;
   color: #111827;
 }
 
-/* Address */
 .sl-address {
   display: flex;
   align-items: center;
@@ -219,7 +205,6 @@ function formatScore(score: number | null | undefined) {
   font-size: 0.835rem;
 }
 
-/* Student Code badge */
 .sl-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -233,7 +218,6 @@ function formatScore(score: number | null | undefined) {
   letter-spacing: 0.03em;
 }
 
-/* Score badges */
 .sl-score {
   display: inline-block;
   padding: 3px 11px;
@@ -247,7 +231,6 @@ function formatScore(score: number | null | undefined) {
 .sl-score--poor      { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 .sl-score--unknown   { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
 
-/* Action buttons */
 .sl-td--actions {
   text-align: center;
   display: flex;
@@ -273,7 +256,6 @@ function formatScore(score: number | null | undefined) {
   font-family: inherit;
 }
 
-/* Edit: indigo accent — khớp với màu primary của Auth */
 .sl-action--edit {
   background: #eef2ff;
   color: #4f46e5;
@@ -287,7 +269,6 @@ function formatScore(score: number | null | undefined) {
   box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
 }
 
-/* Delete: red */
 .sl-action--delete {
   background: #fef2f2;
   color: #ef4444;
@@ -301,10 +282,8 @@ function formatScore(score: number | null | undefined) {
   box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
 }
 
-/* Sort icon hover override */
 .sl-th:hover :deep(.sl-sort-icon) { opacity: 1 !important; }
 
-/* Empty state */
 .sl-empty { padding: 56px 16px; }
 .sl-empty__content {
   display: flex;
@@ -323,6 +302,7 @@ function formatScore(score: number | null | undefined) {
   justify-content: center;
   color: #d1d5db;
   margin-bottom: 4px;
+  font-size: 1.2rem;
 }
 .sl-empty__content p    { font-size: 1rem; font-weight: 600; color: #6b7280; margin: 0; }
 .sl-empty__content span { font-size: 0.825rem; color: #9ca3af; }

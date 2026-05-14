@@ -13,10 +13,7 @@
       <div v-if="mode === 'edit'" class="sd-field">
         <label for="studentId">Student ID</label>
         <div class="sd-readonly-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0110 0v4"></path>
-          </svg>
+          <i class="pi pi-lock"></i>
           {{ formData.studentId }}
         </div>
       </div>
@@ -40,13 +37,7 @@
             @click="generateCode"
             severity="secondary"
             class="sd-generate-btn"
-          >
-            <template #icon>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-              </svg>
-            </template>
-          </Button>
+          />
         </div>
       </div>
 
@@ -323,7 +314,7 @@ defineExpose({ setStudentCode })
   font-size: 0.95rem;
 }
 
-.sd-readonly-box svg {
+.sd-readonly-box i {
   color: #9ca3af;
 }
 
