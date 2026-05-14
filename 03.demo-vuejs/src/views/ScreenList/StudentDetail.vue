@@ -1,10 +1,9 @@
-<template>
+﻿<template>
   <div class="sd-screen">
-    <AppHeader 
-      :username="username" 
-      :show-username="mode === 'edit'" 
+    <AppHeader
+      :show-username="mode === 'edit'"
     />
-    
+
     <main class="sd-main">
       <div class="sd-container">
         <StudentDetailForm
@@ -18,43 +17,35 @@
       </div>
     </main>
   </div>
+  <ToastNotification ref="toast" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
 import AppHeader from '../../components/screenList/Header.vue'
 import StudentDetailForm, { type StudentFormData } from '../../components/screenList/StudentDetailForm.vue'
+import ToastNotification from '../../components/screenList/ToastNotification.vue'
 import {
   createStudentApi,
   generateStudentCodeApi,
   getStudentDetailApi,
   updateStudentApi,
 } from '@/api/axios'
+import { parseApiError } from '@/utils/apiError'
 
 const route = useRoute()
 const router = useRouter()
 const formRef = ref<InstanceType<typeof StudentDetailForm> | null>(null)
+const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 
 const mode = computed<'add' | 'edit'>(() => (route.params.id ? 'edit' : 'add'))
-
-// Mock user information
-const username = 'NguyenVanA' // Using the ID from the mockup image / requirements
 
 type StudentDetailInitialData = Partial<StudentFormData> | null
 const initialData = ref<StudentDetailInitialData>(null)
 
-interface ApiErrorResponse {
-  message?: string
-  errors?: Record<string, string> | null
-}
-
 function mapErrorMessage(error: unknown, fallback: string) {
-  if (!axios.isAxiosError(error)) return fallback
-  const data = error.response?.data as ApiErrorResponse | undefined
-  const firstFieldError = data?.errors ? Object.values(data.errors)[0] : undefined
-  return firstFieldError ?? data?.message ?? fallback
+  return parseApiError(error, fallback).summary
 }
 
 async function loadStudentDetail(studentId: number) {
@@ -65,7 +56,7 @@ async function loadStudentDetail(studentId: number) {
     studentName: response.result.studentName,
     birthday: response.result.birthday,
     address: response.result.address ?? '',
-    averageScore: response.result.averageScore,
+    averageScore: response.result.averageScore != null ? String(response.result.averageScore) : null,
   }
 }
 
@@ -74,7 +65,7 @@ async function generateCode() {
     const response = await generateStudentCodeApi()
     formRef.value?.setStudentCode(response.result)
   } catch (error) {
-    alert(mapErrorMessage(error, 'Không thể tạo mã sinh viên'))
+    toast.value?.show(mapErrorMessage(error, 'Không thể tạo mã sinh viên'), 'error')
   }
 }
 
@@ -92,23 +83,24 @@ onMounted(async () => {
 
     await generateCode()
   } catch (error) {
-    alert(mapErrorMessage(error, 'Không thể tải dữ liệu sinh viên'))
+    toast.value?.show(mapErrorMessage(error, 'Không thể tải dữ liệu sinh viên'), 'error')
     router.push('/students')
   }
 })
 
 async function handleSave(formData: StudentFormData) {
+  const normalizedScore = normalizeAverageScore(formData.averageScore)
+
   try {
     if (mode.value === 'add') {
-      const response = await createStudentApi({
+      await createStudentApi({
         studentCode: formData.studentCode,
         studentName: formData.studentName,
         birthday: formData.birthday,
         address: formData.address,
-        averageScore: typeof formData.averageScore === 'number' ? formData.averageScore : null,
+        averageScore: normalizedScore,
       })
-      alert(response.message)
-      router.push('/students')
+      router.push({ path: '/students', query: { toast: 'created' } })
       return
     }
 
@@ -117,16 +109,16 @@ async function handleSave(formData: StudentFormData) {
       router.push('/students')
       return
     }
-    const response = await updateStudentApi(studentId, {
+
+    await updateStudentApi(studentId, {
       studentName: formData.studentName,
       birthday: formData.birthday,
       address: formData.address,
-      averageScore: typeof formData.averageScore === 'number' ? formData.averageScore : null,
+      averageScore: normalizedScore,
     })
-    alert(response.message)
-    router.push('/students')
+    router.push({ path: '/students', query: { toast: 'updated' } })
   } catch (error) {
-    alert(mapErrorMessage(error, 'Lưu sinh viên thất bại'))
+    toast.value?.show(mapErrorMessage(error, 'Lưu sinh viên thất bại'), 'error')
   }
 }
 
@@ -134,6 +126,19 @@ function handleBack() {
   router.push('/students')
 }
 
+function normalizeAverageScore(value: string | null): number | null {
+  if (value == null) {
+    return null
+  }
+
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  const score = Number(trimmed)
+  return Number.isNaN(score) ? null : score
+}
 </script>
 
 <style scoped>

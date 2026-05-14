@@ -42,9 +42,9 @@ export interface Student {
     id: number;
     code: string;
     name: string;
-    birthday: string;
-    address: string;
-    score: number;
+    birthday: string | null;
+    address: string | null;
+    score: number | null;
 }
 
 export interface StudentPageResponse {

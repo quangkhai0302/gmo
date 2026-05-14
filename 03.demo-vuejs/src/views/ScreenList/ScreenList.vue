@@ -1,13 +1,11 @@
-<template>
+﻿<template>
   <div class="sl-screen">
-    <AppHeader username="Admin" />
+    <AppHeader />
 
     <main class="sl-main">
       <div class="sl-container">
-        <!-- Search form -->
         <SearchForm @search="handleSearch" />
 
-        <!-- Table card -->
         <div class="sl-table-card">
           <div class="sl-table-card__header">
             <div class="sl-table-card__title">
@@ -43,7 +41,6 @@
             @changePage="handlePageChange"
           />
         </div>
-
       </div>
     </main>
 
@@ -59,45 +56,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-
-import AppHeader         from '../../components/screenList/Header.vue'
-import SearchForm        from '../../components/screenList/SearchForm.vue'
-import StudentTable      from '../../components/screenList/StudentTable.vue'
-import Pagination        from '../../components/screenList/Pagination.vue'
-import ConfirmDialog     from '../../components/screenList/ConfirmDialog.vue'
-import ToastNotification from '../../components/screenList/ToastNotification.vue'
-
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { deleteStudentApi, getStudentsApi } from '@/api/axios'
-import type { Student, SearchForm as ISearchForm, SortState, StudentSortField } from '../../types/student'
+import { parseApiError } from '@/utils/apiError'
+import type { SearchForm as ISearchForm, SortState, Student, StudentSortField } from '../../types/student'
+import AppHeader from '../../components/screenList/Header.vue'
+import ConfirmDialog from '../../components/screenList/ConfirmDialog.vue'
+import Pagination from '../../components/screenList/Pagination.vue'
+import SearchForm from '../../components/screenList/SearchForm.vue'
+import StudentTable from '../../components/screenList/StudentTable.vue'
+import ToastNotification from '../../components/screenList/ToastNotification.vue'
 
 const PAGE_SIZE = 10
 const router = useRouter()
+const route = useRoute()
 
-const students    = ref<Student[]>([])
+const students = ref<Student[]>([])
 const currentPage = ref(1)
 const filteredTotal = ref(0)
-const toast       = ref<InstanceType<typeof ToastNotification> | null>(null)
+const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
-const sortState      = reactive<SortState>({ field: null, order: null })
-const dialog         = reactive({ visible: false, studentId: 0, studentName: '' })
+const sortState = reactive<SortState>({ field: null, order: null })
+const dialog = reactive({ visible: false, studentId: 0, studentName: '' })
 
-const startIndex    = computed(() => (currentPage.value - 1) * PAGE_SIZE)
+const startIndex = computed(() => (currentPage.value - 1) * PAGE_SIZE)
 const pagedStudents = computed(() => students.value)
 
-interface ApiErrorResponse {
-  message?: string
-  errors?: Record<string, string> | null
-}
-
 function getErrorMessage(error: unknown, fallback: string) {
-  if (!axios.isAxiosError(error)) return fallback
-  const data = error.response?.data as ApiErrorResponse | undefined
-  const firstFieldError = data?.errors ? Object.values(data.errors)[0] : undefined
-  return firstFieldError ?? data?.message ?? fallback
+  return parseApiError(error, fallback).summary
 }
 
 async function fetchStudents(page = currentPage.value) {
@@ -119,6 +107,7 @@ async function fetchStudents(page = currentPage.value) {
 onMounted(async () => {
   try {
     await fetchStudents(1)
+    showToastFromRouteQuery()
   } catch (error) {
     toast.value?.show(getErrorMessage(error, 'Không thể tải danh sách sinh viên'), 'error')
   }
@@ -135,11 +124,17 @@ async function handleSearch(form: ISearchForm) {
 
 async function handleSort(field: StudentSortField) {
   if (sortState.field === field) {
-    if      (sortState.order === 'asc')  { sortState.order = 'desc' }
-    else if (sortState.order === 'desc') { sortState.field = null; sortState.order = null }
-    else    { sortState.order = 'asc' }
+    if (sortState.order === 'asc') {
+      sortState.order = 'desc'
+    } else if (sortState.order === 'desc') {
+      sortState.field = null
+      sortState.order = null
+    } else {
+      sortState.order = 'asc'
+    }
   } else {
-    sortState.field = field; sortState.order = 'asc'
+    sortState.field = field
+    sortState.order = 'asc'
   }
 
   try {
@@ -188,6 +183,19 @@ function handleAddStudent() {
 function handleRequestEdit(id: number) {
   router.push(`/students/${id}/edit`)
 }
+
+function showToastFromRouteQuery() {
+  if (route.query.toast === 'created') {
+    toast.value?.show('Tạo sinh viên thành công', 'success')
+    router.replace('/students')
+    return
+  }
+
+  if (route.query.toast === 'updated') {
+    toast.value?.show('Cập nhật sinh viên thành công', 'success')
+    router.replace('/students')
+  }
+}
 </script>
 
 <style scoped>
@@ -203,6 +211,7 @@ function handleRequestEdit(id: number) {
   max-width: 1280px;
   margin: 0 auto;
 }
+
 .sl-table-card {
   background: #ffffff;
   border-radius: 18px;
@@ -227,7 +236,9 @@ function handleRequestEdit(id: number) {
   color: #374151;
 }
 
-.sl-table-card__title svg { color: #4f46e5; }
+.sl-table-card__title svg {
+  color: #4f46e5;
+}
 
 .sl-table-actions {
   display: flex;
@@ -268,3 +279,4 @@ function handleRequestEdit(id: number) {
   color: #4f46e5;
 }
 </style>
+

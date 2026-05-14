@@ -43,7 +43,7 @@ api.interceptors.response.use(
         const refreshToken = tokenStorage.getRefreshToken();
         if (!refreshToken) {
             tokenStorage.clearTokens();
-            window.location.href = '/login';
+            window.location.href = '/login?expired=1';
             return Promise.reject(error);
         }
 
@@ -63,7 +63,7 @@ api.interceptors.response.use(
             return api(originalRequest);
         } catch (refreshError) {
             tokenStorage.clearTokens();
-            window.location.href = "/login";
+            window.location.href = "/login?expired=1";
             return Promise.reject(refreshError);
         }
     }

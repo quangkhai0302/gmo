@@ -39,11 +39,16 @@ import router from '@/router';
 import { tokenStorage } from '@/utils/tokenStorage';
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{ username?: string; showUsername?: boolean }>(), { username: 'Admin', showUsername: true })
-const emit = defineEmits<{ logout: [] }>()
+const props = withDefaults(defineProps<{ username?: string; showUsername?: boolean }>(), { showUsername: true })
+const username = computed(() => props.username?.trim() || tokenStorage.getUserName() || 'User')
 
 const initials = computed(() =>
-  props.username.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+  username.value
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
 )
 
 const handleLogout = async () => {

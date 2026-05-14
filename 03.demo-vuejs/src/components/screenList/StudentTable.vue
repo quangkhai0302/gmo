@@ -40,12 +40,12 @@
               <td class="sl-td">{{ formatBirthday(student.birthday) }}</td>
               <td class="sl-td sl-td--address">
                 <div class="sl-address">
-                  {{ student.address }}
+                  {{ formatAddress(student.address) }}
                 </div>
               </td>
               <td class="sl-td sl-td--center sl-td--score">
                 <span :class="['sl-score', scoreClass(student.score)]">
-                  {{ student.score.toFixed(1) }}
+                  {{ formatScore(student.score) }}
                 </span>
               </td>
               <td class="sl-td sl-td--actions">
@@ -92,7 +92,7 @@
 import type { Student, SortState, StudentSortField } from '../../types/student'
 import SortIcon from '../../components/screenList/SortIcon.vue'
 
-const props = defineProps<{
+defineProps<{
   students: Student[]
   sort: SortState
   startIndex: number
@@ -108,14 +108,16 @@ function emitSort(field: StudentSortField) { emit('sort', field) }
 function handleEdit(id: number) { emit('requestEdit', id) }
 function handleDelete(student: Student) { emit('requestDelete', student) }
 
-function scoreClass(score: number) {
+function scoreClass(score: number | null | undefined) {
+  if (score == null) return 'sl-score--unknown'
   if (score >= 8.5) return 'sl-score--excellent'
   if (score >= 7.0) return 'sl-score--good'
   if (score >= 5.5) return 'sl-score--average'
   return 'sl-score--poor'
 }
 
-function formatBirthday(value: string) {
+function formatBirthday(value: string | null | undefined) {
+  if (!value) return '--/--/----'
   const parts = value.split(/[/-]/)
   if (parts.length !== 3) return value
 
@@ -123,6 +125,14 @@ function formatBirthday(value: string) {
   if (year.length === 4) return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
 
   return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`
+}
+
+function formatAddress(value: string | null | undefined) {
+  return value?.trim() ? value : 'N/A'
+}
+
+function formatScore(score: number | null | undefined) {
+  return score == null ? 'N/A' : score.toFixed(1)
 }
 </script>
 
@@ -235,6 +245,7 @@ function formatBirthday(value: string) {
 .sl-score--good      { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
 .sl-score--average   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 .sl-score--poor      { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.sl-score--unknown   { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
 
 /* Action buttons */
 .sl-td--actions {

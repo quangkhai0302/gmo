@@ -89,9 +89,9 @@
         <div class="sd-score-wrapper">
           <InputText
             id="averageScore"
-            type="number"
+            type="text"
+            inputmode="decimal"
             v-model="formData.averageScore"
-            step="0.1"
             placeholder="0.0 - 10.0"
             class="sd-input"
           />
@@ -133,7 +133,7 @@ export interface StudentFormData {
   studentName: string
   birthday: string
   address: string
-  averageScore: number | string | null
+  averageScore: string | null
 }
 
 const props = defineProps<{
@@ -151,9 +151,9 @@ const formData = reactive<StudentFormData>({
   studentId: null as number | null,
   studentCode: '',
   studentName: '',
-  birthday: '',  // YYYY-MM-DD string for native <input type="date">
+  birthday: '', 
   address: '',
-  averageScore: null as number | string | null
+  averageScore: null as string | null
 })
 
 watch(() => props.initialData, (newVal) => {
@@ -163,7 +163,7 @@ watch(() => props.initialData, (newVal) => {
   formData.studentName = newVal.studentName ?? formData.studentName
   formData.birthday = newVal.birthday ?? formData.birthday
   formData.address = newVal.address ?? formData.address
-  formData.averageScore = newVal.averageScore ?? formData.averageScore
+  formData.averageScore = newVal.averageScore != null ? String(newVal.averageScore) : formData.averageScore
 }, { immediate: true })
 
 function generateCode() {
@@ -180,10 +180,7 @@ function scoreClass(score: number) {
 function submitForm() {
   const submitData = { ...formData }
   
-  // Format numeric conversions
-  if (submitData.averageScore !== null && submitData.averageScore !== '') {
-    submitData.averageScore = Number(submitData.averageScore)
-  } else {
+  if (submitData.averageScore === '') {
     submitData.averageScore = null
   }
 
