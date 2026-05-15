@@ -2,7 +2,7 @@ import { tokenStorage } from "@/utils/tokenStorage";
 import axios, { type InternalAxiosRequestConfig } from "axios";
 import type { ApiResponse, AuthRefreshResponse } from "@/api/axios";
 
-const API_BASE_URL = "http://localhost:3000/student-managementt";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim();
 
 const api = axios.create({
     baseURL: API_BASE_URL,
