@@ -1,23 +1,23 @@
-﻿<template>
-  <div class="sl-screen">
+<template>
+  <div class="screen-list">
     <AppHeader />
 
-    <main class="sl-main">
-      <div class="sl-container">
+    <main class="screen-list__main">
+      <div class="screen-list__container">
         <SearchForm @search="handleSearch" />
 
-        <div class="sl-table-card">
-          <div class="sl-table-card__header">
-            <div class="sl-table-card__title">
+        <div class="table-card">
+          <div class="table-card__header">
+            <div class="table-card__title">
               <i class="pi pi-th-large"></i>
               Student List
             </div>
-            <div class="sl-table-actions">
-              <button class="sl-export-btn" :disabled="exportingCsv" @click="handleExportCsv">
+            <div class="table-card__actions">
+              <button class="btn-export" :disabled="exportingCsv" @click="handleExportCsv">
                 <i class="pi pi-download"></i>
                 {{ exportingCsv ? 'Exporting...' : 'Export CSV' }}
               </button>
-              <button class="sl-add-btn" @click="handleAddStudent">
+              <button class="btn-add" @click="handleAddStudent">
                 <i class="pi pi-plus"></i>
                 Add Student
               </button>
@@ -227,108 +227,132 @@ function extractFileName(path: string) {
 </script>
 
 <style scoped>
-.sl-screen {
+.screen-list {
   min-height: 100vh;
 }
 
-.sl-main {
-  padding: 28px 24px 60px;
+.screen-list__main {
+  padding: var(--space-xl) var(--space-xl) var(--space-4xl);
 }
 
-.sl-container {
+.screen-list__container {
   max-width: 1280px;
   margin: 0 auto;
 }
 
-.sl-table-card {
-  background: #ffffff;
-  border-radius: 18px;
+/* ── Table Card ── */
+.table-card {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-card), 0 8px 32px rgba(30, 140, 134, 0.06);
+  border: 1px solid var(--color-border-light);
 }
 
-.sl-table-card__header {
+.table-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f3f4f6;
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.sl-table-card__title {
+.table-card__title {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.875rem;
-  font-weight: 700;
-  color: #374151;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 
-.sl-table-card__title i {
-  color: #4f46e5;
+.table-card__title i {
+  color: var(--color-primary);
 }
 
-.sl-table-actions {
+.table-card__actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.sl-add-btn {
+/* ── Add Student Button — Teal pill ── */
+.btn-add {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-text-on-primary);
   border: none;
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 9px 20px;
+  border-radius: var(--radius-round);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-teal-glow);
+  transition: all var(--transition-bounce);
+  font-family: var(--font-family);
+  letter-spacing: 0.01em;
 }
 
-.sl-add-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+.btn-add:hover {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(43, 168, 162, 0.4);
 }
 
-.sl-export-btn {
+.btn-add:active {
+  transform: scale(0.95);
+}
+
+/* ── Export CSV Button — Gold accent ── */
+.btn-export {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-  padding: 8px 16px;
-  border-radius: 10px;
+  background: rgba(255, 210, 63, 0.12);
+  color: var(--color-accent-dark);
+  border: 1.5px solid rgba(255, 210, 63, 0.3);
+  padding: 9px 20px;
+  border-radius: var(--radius-round);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-bounce);
+  font-family: var(--font-family);
 }
 
-.sl-export-btn:hover:not(:disabled) {
+.btn-export:hover:not(:disabled) {
+  background: rgba(255, 210, 63, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.2);
+  box-shadow: var(--shadow-accent-glow);
 }
 
-.sl-export-btn:disabled {
-  opacity: 0.6;
+.btn-export:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.sl-result-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 12px;
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #4f46e5;
+/* Responsive */
+@media (max-width: 640px) {
+  .screen-list__main {
+    padding: var(--space-lg) var(--space-lg) var(--space-3xl);
+  }
+
+  .table-card__header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: flex-start;
+  }
+
+  .table-card__actions {
+    width: 100%;
+  }
+
+  .btn-add,
+  .btn-export {
+    flex: 1;
+    justify-content: center;
+  }
 }
 </style>

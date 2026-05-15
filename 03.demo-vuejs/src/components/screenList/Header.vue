@@ -1,18 +1,18 @@
-﻿<template>
-  <header class="sl-header">
-    <div class="sl-header__logo">
-      <div class="sl-header__logo-icon">
+<template>
+  <header class="app-header">
+    <div class="app-header__logo">
+      <div class="app-header__logo-icon">
         <i class="pi pi-graduation-cap"></i>
       </div>
-      <span class="sl-header__logo-text">StudentMS</span>
+      <span class="app-header__logo-text">StudentMS</span>
     </div>
 
-    <div class="sl-header__right">
-      <div class="sl-header__user" v-if="showUsername">
-        <div class="sl-header__avatar">{{ initials }}</div>
-        <span class="sl-header__username">Welcome, {{ username }}</span>
+    <div class="app-header__right">
+      <div class="app-header__user" v-if="showUsername">
+        <div class="app-header__avatar">{{ initials }}</div>
+        <span class="app-header__username">Welcome, {{ username }}</span>
       </div>
-      <button class="sl-header__logout" @click="handleLogout">
+      <button class="app-header__logout" @click="handleLogout">
         <i class="pi pi-sign-out"></i>
         Logout
       </button>
@@ -44,99 +44,116 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
-.sl-header {
+.app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  height: 64px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 0 var(--space-2xl);
+  height: 60px;
+  background: var(--color-surface-card);
+  border-bottom: 1.5px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-.sl-header__logo {
+.app-header__logo {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.sl-header__logo-icon {
+.app-header__logo-icon {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: #ffffff;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-text-on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  box-shadow: var(--shadow-teal-glow);
 }
 
-.sl-header__logo-text {
+.app-header__logo-text {
   font-size: 1.15rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  font-weight: var(--font-weight-extrabold);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.02em;
 }
 
-.sl-header__right {
+.app-header__right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-lg);
 }
 
-.sl-header__user {
+.app-header__user {
   display: flex;
   align-items: center;
   gap: 9px;
 }
 
-.sl-header__avatar {
+.app-header__avatar {
   width: 34px;
   height: 34px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: var(--radius-round);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.72rem;
-  font-weight: 700;
-  color: white;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-on-primary);
+  box-shadow: var(--shadow-teal-glow);
 }
 
-.sl-header__username {
+.app-header__username {
   font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
 }
 
-.sl-header__logout {
+.app-header__logout {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  color: #6b7280;
+  padding: 7px 18px;
+  background: var(--color-surface-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-round);
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
+  transition: all var(--transition-base);
+  font-family: var(--font-family);
 }
 
-.sl-header__logout:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
-  color: #ef4444;
+.app-header__logout:hover {
+  background: rgba(239, 108, 74, 0.06);
+  border-color: var(--color-coral-light);
+  color: var(--color-coral);
+  box-shadow: var(--shadow-coral-glow);
+}
+
+.app-header__logout:active {
+  transform: scale(0.95);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0 var(--space-lg);
+  }
+
+  .app-header__username {
+    display: none;
+  }
 }
 </style>

@@ -1,11 +1,11 @@
-﻿<template>
-  <div class="sd-screen">
+<template>
+  <div class="student-detail">
     <AppHeader
       :show-username="mode === 'edit'"
     />
 
-    <main class="sd-main">
-      <div class="sd-container">
+    <main class="student-detail__main">
+      <div class="student-detail__container">
         <StudentDetailForm
           ref="formRef"
           :mode="mode"
@@ -142,16 +142,16 @@ function normalizeAverageScore(value: string | null): number | null {
 </script>
 
 <style scoped>
-.sd-screen {
+.student-detail {
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--color-surface-base);
 }
 
-.sd-main {
-  padding: 40px 24px 60px;
+.student-detail__main {
+  padding: var(--space-3xl) var(--space-xl) var(--space-4xl);
 }
 
-.sd-container {
+.student-detail__container {
   max-width: 800px;
   margin: 0 auto;
 }

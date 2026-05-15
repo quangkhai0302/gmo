@@ -53,14 +53,26 @@ const updateField = (key: string, value?: string) => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <div :class="containerClass">
-      <h2 class="title">{{ title }}</h2>
-      <p class="subtitle">{{ subtitle }}</p>
-      <div v-if="errorSummary" class="auth-error-box" role="alert">
-        <p v-if="errorSummary" class="auth-error-summary">{{ errorSummary }}</p>
+  <div class="auth-wrapper">
+    <div class="auth-card" :class="containerClass">
+      <!-- Logo area -->
+      <div class="auth-logo">
+        <div class="auth-logo__icon">
+          <i class="pi pi-graduation-cap"></i>
+        </div>
+        <span class="auth-logo__text">StudentMS</span>
       </div>
 
+      <h2 class="auth-title">{{ title }}</h2>
+      <p v-if="subtitle" class="auth-subtitle">{{ subtitle }}</p>
+
+      <!-- Error summary -->
+      <div v-if="errorSummary" class="auth-error-box" role="alert">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p class="auth-error-summary">{{ errorSummary }}</p>
+      </div>
+
+      <!-- Fields -->
       <template v-for="field in fields" :key="field.key">
         <div class="auth-field">
           <Password
@@ -83,15 +95,18 @@ const updateField = (key: string, value?: string) => {
             @update:modelValue="updateField(field.key, $event)"
           />
 
-          <p v-if="fieldErrors?.[field.key]" class="auth-field-error">{{ fieldErrors[field.key] }}</p>
+          <p v-if="fieldErrors?.[field.key]" class="auth-field-error">
+            <i class="pi pi-info-circle"></i>
+            {{ fieldErrors[field.key] }}
+          </p>
         </div>
       </template>
 
-      <div :class="['actions-row', { 'actions-row-inline': actionsInline }]">
-        
+      <!-- Actions -->
+      <div :class="['auth-actions', { 'auth-actions--inline': actionsInline }]">
         <Button
           :label="firstSubmitLabel"
-          :class="['auth-primary-btn', firstButtonClass]"
+          :class="['auth-btn-primary', firstButtonClass]"
           @click="emit('firstSubmitButton')"
         />
 
@@ -99,111 +114,170 @@ const updateField = (key: string, value?: string) => {
           v-if="secondSubmitLabel"
           :label="secondSubmitLabel"
           text
-          :class="['auth-secondary-btn', secondButtonClass]"
+          :class="['auth-btn-secondary', secondButtonClass]"
           @click="emit('secondSubmitButton')"
         />
-
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.wrapper {
-  height: 100vh;
+.auth-wrapper {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  background: linear-gradient(145deg, var(--color-surface-base) 0%, var(--color-primary-bg) 50%, #e0f2f0 100%);
+  padding: var(--space-lg);
 }
 
-.login-form,
-.register-form {
-  width: 400px;
-  padding: 32px;
+.auth-card {
+  width: 420px;
+  max-width: 100%;
+  padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
   display: flex;
   flex-direction: column;
+  gap: var(--space-lg);
+  background: var(--color-surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card), 0 8px 32px rgba(30, 140, 134, 0.08);
+  border: 1px solid var(--color-border-light);
+}
+
+/* Logo */
+.auth-logo {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 18px;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
-.title {
+.auth-logo__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-text-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-teal-glow);
+}
+
+.auth-logo__text {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+/* Title & Subtitle */
+.auth-title {
   margin: 0;
   text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: #111827;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
-.subtitle {
-  margin: 0;
+.auth-subtitle {
+  margin: -8px 0 0;
   text-align: center;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
 }
 
+/* Error box */
 .auth-error-box {
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: #991b1b;
-  border-radius: 10px;
-  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid rgba(239, 108, 74, 0.3);
+  background: rgba(239, 108, 74, 0.06);
+  color: var(--color-coral-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.auth-error-box i {
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: var(--color-coral);
 }
 
 .auth-error-summary {
   margin: 0;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
 }
 
+/* Fields */
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .auth-field-error {
   margin: 0;
-  font-size: 12px;
-  color: #dc2626;
-  font-weight: 600;
+  font-size: 11px;
+  color: var(--color-coral);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
+.auth-field-error i {
+  font-size: 10px;
+}
+
+/* Input overrides */
 :deep(.p-inputtext.auth-input) {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    outline: none;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    background: #f9fafb;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-size: var(--font-size-body);
+  transition: all var(--transition-base);
+  background: var(--color-cream);
 }
+
 :deep(.p-inputtext.auth-input)::placeholder {
-  color: #9ca3af !important;
-  opacity: 0.65;
+  color: var(--color-text-muted) !important;
+  opacity: 0.7;
 }
+
 :deep(.p-inputtext.auth-input:enabled:focus) {
-    background: white;
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  background: var(--color-surface-card);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+:deep(.p-inputtext.auth-input:enabled:hover) {
+  border-color: var(--color-primary-light);
 }
 
 :deep(.p-inputtext.auth-input.auth-input--invalid),
 .auth-password :deep(.p-password-input.auth-input.auth-input--invalid) {
-  border-color: #ef4444;
-  background: #fff1f2;
+  border-color: var(--color-coral);
+  background: rgba(239, 108, 74, 0.04);
 }
 
 :deep(.p-inputtext.auth-input.auth-input--invalid:enabled:focus),
 .auth-password :deep(.p-password-input.auth-input.auth-input--invalid:enabled:focus) {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+  box-shadow: 0 0 0 3px rgba(239, 108, 74, 0.15);
 }
 
-
+/* Password component */
 .auth-password {
   width: 100%;
 }
@@ -220,64 +294,84 @@ const updateField = (key: string, value?: string) => {
   display: none;
 }
 
-.auth-primary-btn.p-button {
+/* Primary button — Gold gradient CTA, pill shape */
+.auth-btn-primary.p-button {
   width: 100%;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 13px;
+  border-radius: var(--radius-round);
   border: none;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-bounce);
   justify-content: center;
+  box-shadow: var(--shadow-accent-glow);
+  letter-spacing: 0.02em;
 }
 
-.btn-login.p-button,
-.btn-register.p-button {
-  background: #4f46e5;
+.auth-btn-primary.p-button:hover {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 210, 63, 0.5);
 }
 
-.btn-login.p-button:hover,
-.btn-register.p-button:hover {
-  background: #4338ca;
-  transform: translateY(-1px);
+.auth-btn-primary.p-button:active {
+  transform: scale(0.95);
+  box-shadow: var(--shadow-accent-glow);
 }
 
-.btn-login.p-button:active,
-.btn-register.p-button:active {
-  transform: scale(0.98);
-}
-
-.auth-secondary-btn.p-button {
+/* Secondary button */
+.auth-btn-secondary.p-button {
   width: 100%;
   background: transparent;
   border: none;
-  color: #4f46e5;
-  font-size: 14px;
+  color: var(--color-primary);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  margin-top: -5px;
+  margin-top: -4px;
   justify-content: center;
+  transition: all var(--transition-base);
 }
 
-.auth-secondary-btn.p-button:hover {
+.auth-btn-secondary.p-button:hover {
+  color: var(--color-primary-dark);
   text-decoration: underline;
 }
 
-.actions-row {
+/* Actions layout */
+.auth-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
-.actions-row-inline {
+.auth-actions--inline {
   flex-direction: row-reverse;
   align-items: center;
 }
 
-.actions-row-inline .auth-primary-btn.p-button,
-.actions-row-inline .auth-secondary-btn.p-button {
+.auth-actions--inline .auth-btn-primary.p-button,
+.auth-actions--inline .auth-btn-secondary.p-button {
   width: 50%;
   margin-top: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--space-xl);
+  }
+
+  .auth-actions--inline {
+    flex-direction: column;
+  }
+
+  .auth-actions--inline .auth-btn-primary.p-button,
+  .auth-actions--inline .auth-btn-secondary.p-button {
+    width: 100%;
+  }
 }
 </style>

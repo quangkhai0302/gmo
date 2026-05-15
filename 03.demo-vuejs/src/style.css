@@ -1,5 +1,102 @@
+/* ============================================================
+   Flip7 Design System — Global Tokens & Base Styles
+   Source of truth: docs/ui-design.md
+   ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ── Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Colors — Primary (Teal) */
+  --color-primary: #2BA8A2;
+  --color-primary-light: #3CC4BD;
+  --color-primary-dark: #1E8C86;
+  --color-primary-bg: #E8F6F5;
+
+  /* Colors — Accent (Gold) */
+  --color-accent: #FFD23F;
+  --color-accent-light: #FFE47A;
+  --color-accent-dark: #E6B800;
+
+  /* Colors — Coral */
+  --color-coral: #EF6C4A;
+  --color-coral-light: #FF8A6A;
+  --color-coral-dark: #D45233;
+
+  /* Colors — Neutrals & Surfaces */
+  --color-cream: #FFF8E7;
+  --color-sky: #5DADE2;
+  --color-surface-base: #EFF8F7;
+  --color-surface-card: #FFFFFF;
+
+  /* Colors — Semantic */
+  --color-success: #27AE60;
+  --color-error: #E74C3C;
+
+  /* Colors — Text */
+  --color-text-primary: #1a2332;
+  --color-text-secondary: #4b5e6d;
+  --color-text-muted: #8a9bae;
+  --color-text-on-primary: #ffffff;
+
+  /* Colors — Borders */
+  --color-border: #d4e0e6;
+  --color-border-light: #e8f0f2;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-weight-normal: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Font Sizes (rpx ÷ 2) */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-body: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-h3: 16px;
+  --font-size-h2: 18px;
+  --font-size-h1: 24px;
+  --font-size-display: 36px;
+
+  /* Spacing (base = 4px, from 8rpx ÷ 2) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+  --space-4xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-round: 999px;
+
+  /* Elevation — Colored Glow System */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.16);
+  --shadow-card: 0 2px 10px rgba(43, 168, 162, 0.10);
+  --shadow-coral-glow: 0 2px 10px rgba(239, 108, 74, 0.35);
+  --shadow-teal-glow: 0 2px 10px rgba(43, 168, 162, 0.30);
+  --shadow-accent-glow: 0 2px 10px rgba(255, 210, 63, 0.40);
+  --shadow-sky-glow: 0 2px 8px rgba(93, 173, 226, 0.30);
+  --shadow-focus: 0 0 0 3px rgba(43, 168, 162, 0.18);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-bounce: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── CSS Reset & Base ──────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -15,56 +112,69 @@ body,
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #eef2ff, #f8fafc);
-  background-attachment: fixed;
-  color: #111827;
+  font-family: var(--font-family);
+  background: var(--color-surface-base);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
-/* Custom scrollbar */
+/* ── Custom Scrollbar (Teal-themed) ────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--color-primary-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7d2fe;
+  background: var(--color-primary-light);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #818cf8;
+  background: var(--color-primary);
 }
 
-/* ── PrimeVue InputText — đồng bộ với auth-input ── */
+/* ── PrimeVue InputText — Global Overrides ─────────────────── */
 .p-inputtext {
   width: 100%;
-  padding: 12px 14px !important;
-  border: 1px solid #d1d5db !important;
-  border-radius: 12px !important;
+  padding: 11px 14px !important;
+  border: 1.5px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
   outline: none !important;
-  font-size: 14px !important;
-  transition: all 0.2s ease !important;
-  background: #f9fafb !important;
-  color: #111827 !important;
-  font-family: 'Inter', sans-serif !important;
+  font-size: var(--font-size-body) !important;
+  font-family: var(--font-family) !important;
+  font-weight: var(--font-weight-normal) !important;
+  transition: all var(--transition-base) !important;
+  background: var(--color-cream) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .p-inputtext::placeholder {
-  color: #9ca3af !important;
-  opacity: 0.65 !important;
+  color: var(--color-text-muted) !important;
+  opacity: 0.7 !important;
 }
 
 .p-inputtext:focus,
 .p-inputtext:enabled:focus {
-  background: #ffffff !important;
-  border-color: #4f46e5 !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+  background: var(--color-surface-card) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: var(--shadow-focus) !important;
   outline: none !important;
+}
+
+.p-inputtext:enabled:hover {
+  border-color: var(--color-primary-light) !important;
+}
+
+.p-inputtext:disabled {
+  background-color: var(--color-primary-bg) !important;
+  border-color: var(--color-border-light) !important;
+  opacity: 1 !important;
+  color: var(--color-text-secondary) !important;
+  cursor: not-allowed;
 }

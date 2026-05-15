@@ -1,32 +1,32 @@
 <template>
-  <div class="sd-form-card">
-    <div class="sd-form-header">
-      <h2 class="sd-form-title">{{ mode === 'edit' ? 'Edit Student' : 'Add Student' }}</h2>
-      <span class="sd-form-subtitle">
+  <div class="detail-card">
+    <div class="detail-card__header">
+      <h2 class="detail-card__title">{{ mode === 'edit' ? 'Edit Student' : 'Add Student' }}</h2>
+      <span class="detail-card__subtitle">
         {{ mode === 'edit' ? 'Update the details for the existing student.' : 'Fill in the forms below to register a new student.' }}
       </span>
     </div>
 
-    <form @submit.prevent="submitForm" class="sd-form">
+    <form @submit.prevent="submitForm" class="detail-form">
       
       <!-- Student ID: Only in edit mode -->
-      <div v-if="mode === 'edit'" class="sd-field">
+      <div v-if="mode === 'edit'" class="form-field">
         <label for="studentId">Student ID</label>
-        <div class="sd-readonly-box">
+        <div class="readonly-box">
           <i class="pi pi-lock"></i>
           {{ formData.studentId }}
         </div>
       </div>
 
       <!-- Student Code -->
-      <div class="sd-field">
+      <div class="form-field">
         <label for="studentCode">Student Code</label>
-        <div class="sd-input-with-action">
+        <div class="input-with-action">
           <InputText
             id="studentCode"
             v-model="formData.studentCode"
             disabled
-            class="sd-input w-full font-mono"
+            class="form-input font-mono"
             placeholder="e.g. STU12345"
           />
           <Button
@@ -36,79 +36,79 @@
             icon="pi pi-bolt"
             @click="generateCode"
             severity="secondary"
-            class="sd-generate-btn"
+            class="generate-btn"
           />
         </div>
       </div>
 
       <!-- Student Name -->
-      <div class="sd-field">
+      <div class="form-field">
         <label for="studentName">Student Name</label>
         <InputText
           id="studentName"
           v-model="formData.studentName"
           placeholder="Enter student name"
-          class="sd-input"
+          class="form-input"
         />
       </div>
 
       <!-- Birthday -->
-      <div class="sd-field">
+      <div class="form-field">
         <label for="birthday">Birthday</label>
         <input
           id="birthday"
           type="date"
           v-model="formData.birthday"
-          class="sd-native-date"
+          class="native-date"
         />
       </div>
 
       <!-- Address -->
-      <div class="sd-field">
+      <div class="form-field">
         <label for="address">Address</label>
         <InputText
           id="address"
           v-model="formData.address"
           placeholder="Enter student address (optional)"
-          class="sd-input"
+          class="form-input"
         />
       </div>
 
       <!-- Average Score -->
-      <div class="sd-field">
+      <div class="form-field">
         <label for="averageScore">Average Score</label>
-        <div class="sd-score-wrapper">
+        <div class="score-wrapper">
           <InputText
             id="averageScore"
             type="text"
             inputmode="decimal"
             v-model="formData.averageScore"
             placeholder="0.0 - 10.0"
-            class="sd-input"
+            class="form-input"
           />
-          <div class="sd-score-indicator" v-if="formData.averageScore !== null && formData.averageScore !== ''">
+          <div class="score-indicator" v-if="formData.averageScore !== null && formData.averageScore !== ''">
             <span :class="scoreClass(Number(formData.averageScore))">{{ Number(formData.averageScore).toFixed(1) }}</span>
           </div>
         </div>
       </div>
 
-      <div class="sd-form-divider"></div>
+      <div class="form-divider"></div>
 
       <!-- Actions -->
-      <div class="sd-form-actions">
+      <div class="form-actions">
         <Button 
           type="button" 
           label="Back" 
           severity="secondary" 
           outlined
           @click="$emit('back')" 
-          class="sd-btn-back"
+          class="btn-back"
         />
         <Button 
           type="submit" 
           :label="mode === 'edit' ? 'Save Changes' : 'Create Student'" 
           severity="primary" 
-          class="sd-btn-save"
+          class="btn-save"
         />
       </div>
     </form>
@@ -162,10 +162,10 @@ function generateCode() {
 }
 
 function scoreClass(score: number) {
-  if (score >= 8.5) return 'sd-score--excellent'
-  if (score >= 7.0) return 'sd-score--good'
-  if (score >= 5.5) return 'sd-score--average'
-  return 'sd-score--poor'
+  if (score >= 8.5) return 'score--excellent'
+  if (score >= 7.0) return 'score--good'
+  if (score >= 5.5) return 'score--average'
+  return 'score--poor'
 }
 
 function submitForm() {
@@ -186,254 +186,277 @@ defineExpose({ setStudentCode })
 </script>
 
 <style scoped>
-.sd-form-card {
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+.detail-card {
+  background: var(--color-surface-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card), 0 8px 32px rgba(30, 140, 134, 0.06);
   overflow: hidden;
+  border: 1px solid var(--color-border-light);
 }
 
-.sd-form-header {
-  padding: 32px 40px 24px;
-  background: linear-gradient(to right, #fbfbfe, #ffffff);
-  border-bottom: 1px solid #f3f4f6;
+.detail-card__header {
+  padding: var(--space-2xl) var(--space-3xl) var(--space-xl);
+  background: linear-gradient(to right, var(--color-primary-bg), var(--color-surface-card));
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.sd-form-title {
+.detail-card__title {
   margin: 0 0 6px 0;
   font-size: 1.5rem;
-  font-weight: 800;
-  color: #111827;
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary);
   letter-spacing: -0.01em;
 }
 
-.sd-form-subtitle {
+.detail-card__subtitle {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
-.sd-form {
-  padding: 32px 40px 40px;
+.detail-form {
+  padding: var(--space-2xl) var(--space-3xl) var(--space-3xl);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 
-.sd-field {
+.form-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
-.sd-field label {
+.form-field label {
   font-size: 0.875rem;
-  font-weight: 700;
-  color: #374151;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* Base input overrides */
-:deep(.sd-input), 
-:deep(.sd-datepicker),
-.sd-input {
-  width: 100%;
-}
+/* Inputs use global PrimeVue overrides (cream bg, teal focus) */
 
-:deep(.p-inputtext) {
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  font-size: 0.95rem;
-  background-color: #f9fafb;
-  border-color: #e5e7eb;
-}
-
-:deep(.p-inputtext:enabled:focus) {
-  background-color: #ffffff;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
-}
-
-:deep(.p-inputtext:enabled:hover) {
-  border-color: #d1d5db;
-}
-
-:deep(.p-inputtext:disabled) {
-  background-color: #f3f4f6;
-  opacity: 1;
-  color: #6b7280;
-  cursor: not-allowed;
-}
-
-:deep(.p-datepicker) {
-  width: 100%;
-}
-
-.sd-input-with-action {
+.input-with-action {
   display: flex;
   gap: 12px;
   align-items: flex-start;
 }
 
-.sd-input-with-action > :first-child {
+.input-with-action > :first-child {
   flex: 1;
 }
 
-.sd-generate-btn {
+/* Generate Code button — Gold/Accent themed */
+.generate-btn {
   height: 48px;
   padding: 0 20px;
-  border-radius: 12px;
-  font-weight: 600;
+  border-radius: var(--radius-round) !important;
+  font-weight: var(--font-weight-semibold);
   letter-spacing: -0.01em;
-  background-color: #f0fdf4 !important;
-  color: #166534 !important;
-  border: 1px solid #bbf7d0 !important;
-  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark)) !important;
+  color: var(--color-text-primary) !important;
+  border: none !important;
+  transition: all var(--transition-bounce);
+  box-shadow: var(--shadow-accent-glow);
 }
 
-.sd-generate-btn:hover {
-  background-color: #dcfce7 !important;
-  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.15) !important;
+.generate-btn:hover {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent)) !important;
+  box-shadow: 0 4px 16px rgba(255, 210, 63, 0.5) !important;
   transform: translateY(-1px);
 }
 
-.sd-readonly-box {
+.generate-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Readonly box */
+.readonly-box {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  background-color: #f3f4f6;
-  border: 1px dashed #d1d5db;
-  border-radius: 12px;
-  color: #4b5563;
-  font-weight: 700;
+  background-color: var(--color-primary-bg);
+  border: 1.5px dashed rgba(43, 168, 162, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-bold);
   font-family: monospace;
   font-size: 0.95rem;
 }
 
-.sd-readonly-box i {
-  color: #9ca3af;
+.readonly-box i {
+  color: var(--color-text-muted);
 }
 
 .font-mono {
   font-family: monospace;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.05em;
-  color: #4f46e5 !important;
+  color: var(--color-primary-dark) !important;
 }
 
-.sd-score-wrapper {
+/* Score */
+.score-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.sd-score-indicator {
+.score-indicator {
   position: absolute;
   right: 12px;
   pointer-events: none;
 }
 
-.sd-score-indicator span {
+.score-indicator span {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius-round);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
-.sd-score--excellent { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-.sd-score--good      { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-.sd-score--average   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.sd-score--poor      { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.score--excellent {
+  background: rgba(39, 174, 96, 0.12);
+  color: #1a7a42;
+  border: 1px solid rgba(39, 174, 96, 0.25);
+}
 
-.sd-form-divider {
+.score--good {
+  background: rgba(93, 173, 226, 0.12);
+  color: #2471a3;
+  border: 1px solid rgba(93, 173, 226, 0.25);
+}
+
+.score--average {
+  background: rgba(255, 210, 63, 0.15);
+  color: #9a7d0a;
+  border: 1px solid rgba(255, 210, 63, 0.3);
+}
+
+.score--poor {
+  background: rgba(239, 108, 74, 0.1);
+  color: var(--color-coral-dark);
+  border: 1px solid rgba(239, 108, 74, 0.25);
+}
+
+/* Divider */
+.form-divider {
   height: 1px;
-  background-color: #e5e7eb;
-  margin: 12px 0;
+  background-color: var(--color-border-light);
+  margin: var(--space-sm) 0;
 }
 
-.sd-form-actions {
+/* Action buttons */
+.form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
+  gap: var(--space-lg);
 }
 
-.sd-btn-back,
-.sd-btn-save {
+.btn-back,
+.btn-save {
   padding: 12px 28px;
-  border-radius: 12px;
-  font-weight: 700;
+  border-radius: var(--radius-round);
+  font-weight: var(--font-weight-bold);
   font-size: 0.95rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-bounce);
 }
 
-.sd-btn-back {
+.btn-back {
   background-color: transparent;
-  color: #4b5563;
-  border: 1px solid #d1d5db;
+  color: var(--color-text-secondary);
+  border: 1.5px solid var(--color-border);
 }
 
-.sd-btn-back:hover {
-  background-color: #f9fafb;
-  color: #111827;
-  border-color: #9ca3af;
+.btn-back:hover {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary-light);
 }
 
-.sd-btn-save {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: #ffffff;
+.btn-back:active {
+  transform: scale(0.95);
+}
+
+/* Save — Gold gradient CTA */
+.btn-save {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+  color: var(--color-text-primary);
   border: none;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  box-shadow: var(--shadow-accent-glow);
+  letter-spacing: 0.02em;
 }
 
-.sd-btn-save:hover {
-  background: linear-gradient(135deg, #4338ca, #6d28d9);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
-  transform: translateY(-1px);
+.btn-save:hover {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent));
+  box-shadow: 0 4px 16px rgba(255, 210, 63, 0.5);
+  transform: translateY(-2px);
 }
 
-
-.sd-btn-save:active {
-  transform: translateY(0);
+.btn-save:active {
+  transform: scale(0.95);
+  box-shadow: var(--shadow-accent-glow);
 }
 
-/* Native date input - styled to match PrimeVue InputText */
-.sd-native-date {
+/* Native date input — styled to match design system */
+.native-date {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background-color: #f9fafb;
-  font-family: inherit;
+  padding: 11px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-cream);
+  font-family: var(--font-family);
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--color-text-primary);
   outline: none;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
   -webkit-appearance: none;
   appearance: none;
 }
 
-.sd-native-date:focus {
-  background-color: #ffffff;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+.native-date:focus {
+  background-color: var(--color-surface-card);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
 }
 
-.sd-native-date:hover {
-  border-color: #d1d5db;
+.native-date:hover {
+  border-color: var(--color-primary-light);
 }
 
-.sd-native-date::-webkit-calendar-picker-indicator {
+.native-date::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s;
 }
 
-.sd-native-date::-webkit-calendar-picker-indicator:hover {
+.native-date::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .detail-card__header,
+  .detail-form {
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+  }
+
+  .input-with-action {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-back,
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

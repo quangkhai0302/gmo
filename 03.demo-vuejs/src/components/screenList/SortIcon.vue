@@ -1,8 +1,8 @@
 <template>
-  <span class="sl-sort-icon">
-    <i v-if="!isActive" class="pi pi-sort-alt sl-sort-icon--inactive"></i>
-    <i v-else-if="sort.order === 'asc'" class="pi pi-sort-amount-up sl-sort-icon--active"></i>
-    <i v-else class="pi pi-sort-amount-down sl-sort-icon--active"></i>
+  <span class="sort-icon">
+    <i v-if="!isActive" class="pi pi-sort-alt sort-icon--inactive"></i>
+    <i v-else-if="sort.order === 'asc'" class="pi pi-sort-amount-up sort-icon--active"></i>
+    <i v-else class="pi pi-sort-amount-down sort-icon--active"></i>
   </span>
 </template>
 
@@ -18,18 +18,20 @@ const isActive = computed(
 </script>
 
 <style scoped>
-.sl-sort-icon {
+.sort-icon {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
   font-size: 0.75rem;
 }
 
-.sl-sort-icon--inactive {
-  color: #9ca3af;
+.sort-icon--inactive {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
 }
 
-.sl-sort-icon--active {
-  color: #4f46e5;
+.sort-icon--active {
+  color: var(--color-primary);
 }
 </style>

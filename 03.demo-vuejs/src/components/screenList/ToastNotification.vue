@@ -1,16 +1,16 @@
-﻿<template>
+<template>
   <Teleport to="body">
-    <div class="sl-toast-container">
+    <div class="toast-container">
       <TransitionGroup name="toast">
-        <div v-for="toast in toasts" :key="toast.id" :class="['sl-toast', `sl-toast--${toast.type}`]">
-          <div class="sl-toast__icon-wrap" aria-hidden="true">
+        <div v-for="toast in toasts" :key="toast.id" :class="['toast-item', `toast-item--${toast.type}`]">
+          <div class="toast-item__icon-wrap" aria-hidden="true">
             <i v-if="toast.type === 'success'" class="pi pi-check-circle"></i>
             <i v-else class="pi pi-exclamation-circle"></i>
           </div>
 
-          <div class="sl-toast__content">
-            <p class="sl-toast__title">{{ toastTitle(toast.type) }}</p>
-            <p class="sl-toast__message">{{ toast.message }}</p>
+          <div class="toast-item__content">
+            <p class="toast-item__title">{{ toastTitle(toast.type) }}</p>
+            <p class="toast-item__message">{{ toast.message }}</p>
           </div>
         </div>
       </TransitionGroup>
@@ -40,7 +40,7 @@ defineExpose({ show })
 </script>
 
 <style scoped>
-.sl-toast-container {
+.toast-container {
   position: fixed;
   top: 72px;
   right: 20px;
@@ -51,34 +51,36 @@ defineExpose({ show })
   pointer-events: none;
 }
 
-.sl-toast {
+.toast-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   max-width: 380px;
-  box-shadow: 0 14px 30px rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
   pointer-events: all;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-light);
   position: relative;
   overflow: hidden;
 }
 
-.sl-toast::after {
+/* Left accent bar */
+.toast-item::after {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
   width: 4px;
   height: 100%;
+  border-radius: 0 2px 2px 0;
 }
 
-.sl-toast__icon-wrap {
+.toast-item__icon-wrap {
   width: 28px;
   height: 28px;
-  border-radius: 999px;
+  border-radius: var(--radius-round);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -86,44 +88,78 @@ defineExpose({ show })
   font-size: 0.95rem;
 }
 
-.sl-toast__content {
+.toast-item__content {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.sl-toast__title {
+.toast-item__title {
   margin: 0;
   font-size: 0.82rem;
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.sl-toast__message {
+.toast-item__message {
   margin: 0;
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   line-height: 1.35;
 }
 
-.sl-toast--success {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fffc 100%);
-  color: #065f46;
+/* Success — Teal themed */
+.toast-item--success {
+  background: linear-gradient(180deg, #ffffff 0%, #f0faf9 100%);
+  color: var(--color-primary-dark);
 }
-.sl-toast--success::after { background: #10b981; }
-.sl-toast--success .sl-toast__icon-wrap { background: #d1fae5; color: #10b981; }
-.sl-toast--success .sl-toast__title { color: #047857; }
 
-.sl-toast--error {
-  background: linear-gradient(180deg, #ffffff 0%, #fff8f8 100%);
-  color: #991b1b;
+.toast-item--success::after {
+  background: var(--color-success);
 }
-.sl-toast--error::after { background: #ef4444; }
-.sl-toast--error .sl-toast__icon-wrap { background: #fee2e2; color: #ef4444; }
-.sl-toast--error .sl-toast__title { color: #b91c1c; }
 
-.toast-enter-active, .toast-leave-active { transition: all 0.28s ease; }
-.toast-enter-from { opacity: 0; transform: translateX(40px); }
-.toast-leave-to   { opacity: 0; transform: translateX(40px); }
+.toast-item--success .toast-item__icon-wrap {
+  background: rgba(39, 174, 96, 0.12);
+  color: var(--color-success);
+}
+
+.toast-item--success .toast-item__title {
+  color: var(--color-primary-dark);
+}
+
+/* Error — Coral themed */
+.toast-item--error {
+  background: linear-gradient(180deg, #ffffff 0%, #fef6f4 100%);
+  color: var(--color-coral-dark);
+}
+
+.toast-item--error::after {
+  background: var(--color-coral);
+}
+
+.toast-item--error .toast-item__icon-wrap {
+  background: rgba(239, 108, 74, 0.1);
+  color: var(--color-coral);
+}
+
+.toast-item--error .toast-item__title {
+  color: var(--color-coral-dark);
+}
+
+/* Transition */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(40px);
+}
 </style>
