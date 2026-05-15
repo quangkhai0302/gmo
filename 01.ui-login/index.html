@@ -1,85 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
+
 <head>
   <meta charset="UTF-8">
-  <title>Login Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Trang đăng nhập hệ thống quản lý">
+  <title>Đăng Nhập — Hệ Thống</title>
 
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- jQuery UI -->
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+  <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="login-box" id="loginForm">
-  <h3>Login</h3>
-  <div class="mb-3">
-    <input type="text" id="username" class="form-control" placeholder="Username">
+  <!-- ========== BACKGROUND ========== -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+    <div class="orb orb--3"></div>
   </div>
-  <div class="mb-3">
-    <input type="password" id="password" class="form-control" placeholder="Password">
+
+  <!-- ========== LOGIN ========== -->
+  <main class="login-wrapper" id="loginForm">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-11 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+
+          <div class="login-card">
+            <!-- Tiêu đề -->
+            <div class="login-card__header text-center">
+              <h1 class="login-card__title">Chào mừng trở lại</h1>
+              <p class="login-card__subtitle">Đăng nhập để tiếp tục vào hệ thống</p>
+            </div>
+
+            <!-- Form đăng nhập -->
+            <form id="loginFormInner" autocomplete="off">
+
+              <!-- Username -->
+              <div class="mb-3">
+                <label class="form-label" for="username">Tên đăng nhập</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fa-regular fa-user"></i>
+                  </span>
+                  <input type="text" id="username" class="form-control" placeholder="Nhập tên đăng nhập"
+                    autocomplete="username">
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="mb-3">
+                <label class="form-label" for="password">Mật khẩu</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fa-solid fa-lock"></i>
+                  </span>
+                  <input type="password" id="password" class="form-control" placeholder="Nhập mật khẩu"
+                    autocomplete="current-password">
+                  <button type="button" class="input-group-text toggle-password" id="togglePassword">
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Ghi nhớ + Quên mật khẩu -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="rememberMe">
+                  <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                </div>
+                <a href="#" class="forgot-link" id="forgotPassword">Quên mật khẩu?</a>
+              </div>
+
+              <!-- Nút Login -->
+              <button type="submit" class="btn btn-login w-100" id="loginBtn">
+                <span class="btn-login__text">Đăng Nhập</span>
+                <span class="btn-login__loader d-none">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                </span>
+              </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">
+              <span class="divider__line"></span>
+              <span class="divider__text">hoặc đăng nhập bằng</span>
+              <span class="divider__line"></span>
+            </div>
+
+            <!-- Social Login -->
+            <div class="social-login d-flex justify-content-center gap-3">
+              <button type="button" class="btn social-btn" id="gg">
+                <i class="fa-brands fa-google"></i>
+              </button>
+              <button type="button" class="btn social-btn" id="fb">
+                <i class="fa-brands fa-facebook-f"></i>
+              </button>
+              <button type="button" class="btn social-btn" id="tw">
+                <i class="fa-brands fa-x-twitter"></i>
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <p class="login-card__footer text-center mt-4">
+              Chưa có tài khoản? <a href="#" class="signup-link">Đăng ký miễn phí</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== TABLE SAU KHI LOGIN ========== -->
+  <div class="container py-5" id="tableSection" style="display:none;">
+    <div class="dashboard-card">
+      <h2 class="dashboard-title">
+        Xin chào, <span id="usernameDisplay" class="text-primary-custom"></span> 👋
+      </h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Công ty</th>
+              <th>Liên hệ</th>
+              <th>Quốc gia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Alfreds Futterkiste</td>
+              <td>Maria Anders</td>
+              <td>Germany</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Centro comercial Moctezuma</td>
+              <td>Francisco Chang</td>
+              <td>Mexico</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Ernst Handel</td>
+              <td>Roland Mendel</td>
+              <td>Austria</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Island Trading</td>
+              <td>Helen Bennett</td>
+              <td>UK</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Laughing Bacchus Winecellars</td>
+              <td>Yoshi Tannamuri</td>
+              <td>Canada</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Magazzini Alimentari Riuniti</td>
+              <td>Giovanni Rovelli</td>
+              <td>Italy</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <button class="login-btn" id="loginBtn">LOGIN</button>
-  <p class="mt-3">Or Sign Up Using</p>
-  <div class="social">
-    <i class="bi bi-facebook text-primary" id="fb"></i>
-    <i class="bi bi-twitter text-info" id="tw"></i>
-    <i class="bi bi-google text-danger" id="gg"></i>
+
+  <!-- jQuery UI Dialog (ẩn) -->
+  <div id="dialog" title="Message" style="display:none;">
+    <p id="dialogMsg"></p>
   </div>
-</div>
 
-<div class="container" id="tableSection" style="display:none;">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Contact</th>
-        <th>Country</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Alfreds Futterkiste</td>
-        <td>Maria Anders</td>
-        <td>Germany</td>
-      </tr>
-      <tr>
-        <td>Centro comercial Moctezuma</td>
-        <td>Francisco Chang</td>
-        <td>Mexico</td>
-      </tr>
-      <tr>
-        <td>Ernst Handel</td>
-        <td>Roland Mendel</td>
-        <td>Austria</td>
-      </tr>
-      <tr>
-        <td>Island Trading</td>
-        <td>Helen Bennett</td>
-        <td>UK</td>
-      </tr>
-      <tr>
-        <td>Laughing Bacchus Winecellars</td>
-        <td>Yoshi Tannamuri</td>
-        <td>Canada</td>
-      </tr>
-      <tr>
-        <td>Magazzini Alimentari Riuniti</td>
-        <td>Giovanni Rovelli</td>
-        <td>Italy</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div id="dialog" title="Thông báo" style="display:none;">
-  <p id="dialogMsg"></p>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-<script src="main.js"></script>
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
+
 </html>

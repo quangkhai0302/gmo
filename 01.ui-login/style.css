@@ -1,0 +1,716 @@
+/* ============================================================
+   STYLE.CSS — Modern Login UI 2025
+   Bootstrap 5 + Custom overrides
+   Light Theme — Clean, Premium, SaaS style
+   ============================================================ */
+
+/* =============================================================
+   CSS VARIABLES — Light Palette
+   ============================================================ */
+:root {
+  /* Primary — Indigo */
+  --primary: #6366F1;
+  --primary-hover: #4F46E5;
+  --primary-light: rgba(99, 102, 241, 0.08);
+  --primary-glow: rgba(99, 102, 241, 0.18);
+
+  /* Background */
+  --bg-body: #F1F5F9;
+  --bg-elevated: #FFFFFF;
+
+  /* Surface — Card, input */
+  --surface: #FFFFFF;
+  --surface-hover: #F8FAFC;
+
+  /* Border */
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --border-focus: rgba(99, 102, 241, 0.5);
+
+  /* Text */
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-error: #DC2626;
+  --text-success: #16A34A;
+
+  /* Misc */
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04),
+                 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 4px 14px rgba(99, 102, 241, 0.2);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* =============================================================
+   BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-body);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+.text-primary-custom {
+  color: var(--primary) !important;
+}
+
+/* =============================================================
+   ANIMATED BACKGROUND
+   Orbs nhẹ nhàng trên nền sáng
+   ============================================================ */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.35;
+}
+
+/* Orb Indigo nhạt — góc trên trái */
+.orb--1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #C7D2FE 0%, transparent 70%);
+  top: -15%;
+  left: -10%;
+  animation: orbFloat1 20s ease-in-out infinite;
+}
+
+/* Orb Violet nhạt — góc dưới phải */
+.orb--2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #DDD6FE 0%, transparent 70%);
+  bottom: -10%;
+  right: -5%;
+  animation: orbFloat2 24s ease-in-out infinite;
+}
+
+/* Orb Sky nhạt — giữa */
+.orb--3 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #BAE6FD 0%, transparent 70%);
+  top: 55%;
+  left: 45%;
+  animation: orbFloat3 18s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(50px, 30px) scale(1.05); }
+  66%      { transform: translate(-20px, 50px) scale(0.97); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-40px, -25px) scale(1.03); }
+  66%      { transform: translate(30px, -40px) scale(0.95); }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-40px, -30px) scale(1.08); }
+}
+
+/* =============================================================
+   LOGIN CARD
+   ============================================================ */
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px 0;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px 36px;
+  box-shadow: var(--shadow-card);
+  animation: cardEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =============================================================
+   CARD HEADER
+   ============================================================ */
+.login-card__header {
+  margin-bottom: 32px;
+}
+
+.login-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.login-card__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
+/* =============================================================
+   FORM INPUTS — Bootstrap light override
+   ============================================================ */
+.form-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  margin-bottom: 6px;
+}
+
+.input-group-text {
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-right: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  transition: all var(--transition);
+}
+
+.form-control {
+  height: 46px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.875rem;
+  transition: all var(--transition);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* Ẩn nút reveal password mặc định của trình duyệt (Edge/Chrome) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
+
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+/* Hover */
+.form-control:hover,
+.input-group:hover .form-control,
+.input-group:hover .input-group-text {
+  border-color: var(--border-hover);
+}
+
+/* Focus — viền indigo + glow nhẹ */
+.form-control:focus {
+  background: #FFFFFF;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--primary-light);
+  color: var(--text);
+}
+
+.form-control:focus ~ .input-group-text,
+.input-group:focus-within .input-group-text {
+  border-color: var(--border-focus);
+  color: var(--primary);
+}
+
+/* Nút toggle password — chỉ hiện 1 icon duy nhất */
+.toggle-password {
+  cursor: pointer;
+  border-left: none !important;
+  transition: color var(--transition);
+  position: relative;
+  z-index: 3;
+}
+
+.toggle-password:hover {
+  color: var(--text-secondary) !important;
+}
+
+/* Đảm bảo chỉ 1 icon trong nút toggle */
+.toggle-password i {
+  pointer-events: none;
+}
+
+/* Ẩn tất cả icon thừa (chỉ giữ icon đầu tiên) */
+.toggle-password i ~ i {
+  display: none !important;
+}
+
+/* Ẩn icon Bootstrap tự thêm (nếu có) */
+.toggle-password .bi {
+  display: none !important;
+}
+
+/* =============================================================
+   CHECKBOX
+   ============================================================ */
+.form-check-input {
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--border-hover);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: var(--border-focus);
+}
+
+.form-check-label {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.forgot-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  color: var(--primary-hover);
+}
+
+/* =============================================================
+   LOGIN BUTTON
+   ============================================================ */
+.btn-login {
+  position: relative;
+  height: 46px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.btn-login:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+  color: #fff;
+  filter: brightness(1.05);
+}
+
+.btn-login:active {
+  transform: translateY(0) scale(0.98);
+  filter: brightness(1);
+}
+
+.btn-login__text {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-login__loader {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-login.is-loading .btn-login__text {
+  display: none;
+}
+
+.btn-login.is-loading .btn-login__loader {
+  display: inline-block !important;
+}
+
+/* =============================================================
+   DIVIDER
+   ============================================================ */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0 24px;
+}
+
+.divider__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider__text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* =============================================================
+   SOCIAL BUTTONS
+   ============================================================ */
+.social-btn {
+  width: 52px;
+  height: 48px;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all var(--transition);
+}
+
+.social-btn:hover {
+  background: var(--surface-hover) !important;
+  border-color: var(--border-hover) !important;
+  color: var(--text) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.social-btn:active {
+  transform: translateY(0);
+}
+
+/* =============================================================
+   CARD FOOTER
+   ============================================================ */
+.login-card__footer {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+.signup-link {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* =============================================================
+   DASHBOARD TABLE
+   ============================================================ */
+.dashboard-card {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-card);
+  animation: cardEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dashboard-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+
+/* Override Bootstrap table */
+.data-table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: #F8FAFC;
+  --bs-table-hover-color: var(--text);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+/* Table header */
+.data-table thead th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  background: var(--surface-hover);
+  padding: 14px 16px;
+}
+
+/* Table body */
+.data-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #F1F5F9;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover row */
+.data-table tbody tr {
+  transition: background var(--transition);
+}
+
+.data-table tbody tr:hover td {
+  background: rgba(99, 102, 241, 0.04);
+  color: var(--text);
+}
+
+/* =============================================================
+   JQUERY UI DIALOG — Light theme override
+   ============================================================ */
+.ui-dialog {
+  font-family: var(--font) !important;
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-elevated) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+  padding: 0 !important;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+  background: var(--surface-hover) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 14px 18px !important;
+}
+
+/* Nút close (X) — ẩn icon sprite mặc định, dùng ký tự ✕ */
+.ui-dialog .ui-dialog-titlebar-close {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--text-muted) !important;
+  width: 28px !important;
+  height: 28px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  right: 14px !important;
+  transition: all var(--transition) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* Ẩn icon sprite gốc của jQuery UI */
+.ui-dialog .ui-dialog-titlebar-close .ui-icon {
+  display: none !important;
+}
+
+/* Hiện ký tự X bằng ::after */
+.ui-dialog .ui-dialog-titlebar-close::after {
+  content: '✕';
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.ui-dialog .ui-dialog-titlebar-close:hover {
+  background: var(--surface-hover) !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close:hover::after {
+  color: var(--text);
+}
+
+/* Message lỗi — màu đỏ */
+.ui-dialog .ui-dialog-content {
+  color: var(--text-error) !important;
+  font-size: 0.875rem !important;
+  padding: 20px 18px !important;
+  line-height: 1.6 !important;
+}
+
+/* Button OK — căn giữa */
+.ui-dialog .ui-dialog-buttonpane {
+  border-top: 1px solid var(--border) !important;
+  background: var(--surface-hover) !important;
+  padding: 14px 18px !important;
+  text-align: center !important;
+  margin-top: 0 !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane button {
+  background: var(--primary) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 8px 32px !important;
+  font-family: var(--font) !important;
+  font-weight: 500 !important;
+  font-size: 0.85rem !important;
+  cursor: pointer !important;
+  margin: 0 auto !important;
+  display: inline-block !important;
+  transition: all var(--transition) !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane button:hover {
+  background: var(--primary-hover) !important;
+  box-shadow: var(--shadow-glow) !important;
+}
+
+.ui-widget-overlay {
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+/* =============================================================
+   HIỆU ỨNG RUNG — Khi đăng nhập sai
+   ============================================================ */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%      { transform: translateX(-8px); }
+  30%      { transform: translateX(8px); }
+  45%      { transform: translateX(-6px); }
+  60%      { transform: translateX(6px); }
+  75%      { transform: translateX(-3px); }
+  90%      { transform: translateX(3px); }
+}
+
+/* =============================================================
+   TOAST NOTIFICATION — Thông báo thành công
+   ============================================================ */
+.toast-custom {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10000;
+  min-width: 300px;
+  max-width: 420px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  background: #F0FDF4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.toast-custom .toast-icon {
+  color: var(--text-success);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.toast-custom.is-leaving {
+  animation: toastOut 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(50px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(50px) scale(0.96); }
+}
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 576px) {
+  .login-card {
+    padding: 32px 24px 28px;
+    border-radius: var(--radius-md);
+  }
+
+  .login-card__title {
+    font-size: 1.35rem;
+  }
+
+  .form-control {
+    font-size: 1rem !important;
+  }
+
+  .toast-custom {
+    right: 12px;
+    left: 12px;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .orb--1 { width: 300px; height: 300px; }
+  .orb--2 { width: 250px; height: 250px; }
+  .orb--3 { width: 200px; height: 200px; }
+}
+
+/* =============================================================
+   ACCESSIBILITY
+   ============================================================ */
+::selection {
+  background: var(--primary-light);
+  color: var(--text);
+}
