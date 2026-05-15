@@ -214,10 +214,17 @@ a:hover {
   margin-bottom: 6px;
 }
 
+.input-group > .input-group-text:first-child {
+  border-right: none;
+}
+
+.input-group > .input-group-text:last-child {
+  border-left: none;
+}
+
 .input-group-text {
   background: var(--surface-hover);
   border: 1px solid var(--border);
-  border-right: none;
   color: var(--text-muted);
   font-size: 0.875rem;
   transition: all var(--transition);

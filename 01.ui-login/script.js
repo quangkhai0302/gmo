@@ -88,7 +88,7 @@ $(function () {
 
     // --- Trường hợp 1: Username hoặc password rỗng ---
     if (user === "" || pass === "") {
-      showDialog("Vui lòng nhập username và password!", function () {
+      showDialog("Vui lòng nhập tài khoản và mật khẩu!", function () {
         // Sau khi nhấn OK: focus vào username, xóa dữ liệu
         $("#username").val("").focus();
         $("#password").val("");
