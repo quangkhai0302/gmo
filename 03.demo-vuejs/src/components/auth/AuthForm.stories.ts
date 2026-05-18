@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import AuthForm, { type AuthField } from './AuthForm.vue'
 
 const loginFields: AuthField[] = [
-  { key: 'username', type: 'text', placeholder: 'Username' },
+  { key: 'email', type: 'email', placeholder: 'Email' },
   { key: 'password', type: 'password', placeholder: 'Password' },
 ]
 
@@ -15,7 +15,7 @@ const meta = {
     title: 'Login',
     subtitle: 'Sign in to continue',
     fields: loginFields,
-    modelValue: { username: '', password: '' },
+    modelValue: { email: '', password: '' },
     firstSubmitLabel: 'Login',
     secondSubmitLabel: 'Create account',
     containerClass: 'login-form',
@@ -63,11 +63,11 @@ export const Register: Story = {
     title: 'Register',
     subtitle: '',
     fields: [
-      { key: 'username', type: 'text', placeholder: 'username' },
+      { key: 'email', type: 'email', placeholder: 'Email' },
       { key: 'password', type: 'password', placeholder: 'Password' },
       { key: 'confirmPassword', type: 'password', placeholder: 'Confirm Password' },
     ],
-    modelValue: { username: '', password: '', confirmPassword: '' },
+    modelValue: { email: '', password: '', confirmPassword: '' },
     firstSubmitLabel: 'Register',
     secondSubmitLabel: 'Back to login',
     containerClass: 'register-form',
@@ -81,9 +81,9 @@ export const WithErrors: Story = {
   args: {
     errorSummary: 'Please review the highlighted fields.',
     fieldErrors: {
-      username: 'Username is required.',
+      email: 'Email is required.',
       password: 'Password must be at least 8 characters.',
     },
-    modelValue: { username: '', password: '123' },
+    modelValue: { email: '', password: '123' },
   },
 }

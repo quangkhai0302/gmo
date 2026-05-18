@@ -19,6 +19,8 @@ api.interceptors.request.use((config) => {
     const isPublicAuthApi = 
         url.includes('/api/auth/login') ||
         url.includes('/api/auth/register') ||
+        url.includes('/api/auth/verify-email') ||
+        url.includes('/api/auth/resend-verification-email') ||
         url.includes('/api/auth/refresh');
     
     if (accessToken && !isPublicAuthApi) {

@@ -5,13 +5,12 @@ import AuthForm, { type AuthField } from '../../components/auth/AuthForm.vue'
 import ToastNotification from '../../components/screenList/ToastNotification.vue'
 import { registerApi } from '@/api/axios'
 import { parseApiError } from '@/utils/apiError'
-import { tokenStorage } from '@/utils/tokenStorage'
 
 const router = useRouter()
 const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 
 const form = ref<Record<string, string>>({
-  username: '',
+  email: '',
   password: '',
   confirmPassword: '',
 })
@@ -19,7 +18,7 @@ const registerErrorSummary = ref('')
 const registerFieldErrors = ref<Record<string, string>>({})
 
 const fields: AuthField[] = [
-  { key: 'username', type: 'text', placeholder: 'username' },
+  { key: 'email', type: 'email', placeholder: 'Email' },
   { key: 'password', type: 'password', placeholder: 'Password' },
   { key: 'confirmPassword', type: 'password', placeholder: 'Confirm Password' },
 ]
@@ -38,19 +37,16 @@ const register = async () => {
     registerFieldErrors.value = {}
 
     const response = await registerApi({
-      username: form.value.username,
+      email: form.value.email,
       password: form.value.password,
       confirmPassword: form.value.confirmPassword,
     })
 
-    tokenStorage.setTokens(
-      response.result.accessToken,
-      response.result.refreshToken,
-      response.result.user?.username,
-    )
-
     toast.value?.show(response.message, 'success')
-    router.push('/dashboard')
+    router.push({
+      path: '/login',
+      query: { verify: 'sent', email: form.value.email },
+    })
   } catch (error) {
     const mapped = getRegisterErrorMessage(error)
     registerErrorSummary.value = mapped.summary

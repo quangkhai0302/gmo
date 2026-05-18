@@ -2,21 +2,22 @@ import { logoutApi } from "@/api/axios"
 
 const ACCESS_TOKEN_KEY = 'access_token'
 const REFRESH_TOKEN_KEY = 'refresh_token'
-const USERNAME_KEY = 'username'
+const USER_EMAIL_KEY = 'user_email'
+const LEGACY_USERNAME_KEY = 'username'
 
 export const tokenStorage = {
-    setTokens(accessToken: string, refreshToken: string, username?: string) {
+    setTokens(accessToken: string, refreshToken: string, email?: string) {
         localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
-        if (username && username.trim()) {
-            localStorage.setItem(USERNAME_KEY, username)
+        if (email && email.trim()) {
+            localStorage.setItem(USER_EMAIL_KEY, email)
         }
     },
 
     getUserName(): string | null {
-        const username = localStorage.getItem(USERNAME_KEY);
-        if (username && username.trim()) {
-            return username;
+        const email = localStorage.getItem(USER_EMAIL_KEY);
+        if (email && email.trim()) {
+            return email;
         }
 
         const token = this.getAccessToken();
@@ -31,8 +32,8 @@ export const tokenStorage = {
             const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
             const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
             const payloadJson = atob(padded);
-            const payload = JSON.parse(payloadJson) as { username?: string };
-            return payload.username || null;
+            const payload = JSON.parse(payloadJson) as { email?: string };
+            return payload.email || null;
         } catch {
             return null;
         }
@@ -49,7 +50,8 @@ export const tokenStorage = {
     clearTokens() {
         localStorage.removeItem(ACCESS_TOKEN_KEY)
         localStorage.removeItem(REFRESH_TOKEN_KEY)
-        localStorage.removeItem(USERNAME_KEY)
+        localStorage.removeItem(USER_EMAIL_KEY)
+        localStorage.removeItem(LEGACY_USERNAME_KEY)
     },
 
     hasAccessToken(): boolean {

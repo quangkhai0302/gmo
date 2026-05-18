@@ -1,5 +1,6 @@
 import Login from "../views/Auth/Login.vue";
 import Register from "../views/Auth/Register.vue";
+import VerifyEmail from "../views/Auth/VerifyEmail.vue";
 import DashboardView from "../views/Dashboard/DashboardView.vue";
 import PlaceholderView from "../views/Placeholder/PlaceholderView.vue";
 import ScreenList from "../views/ScreenList/ScreenList.vue";
@@ -19,6 +20,10 @@ const routes = [
     {
         path: '/register',
         component: Register
+    },
+    {
+        path: '/verify-email',
+        component: VerifyEmail
     },
     {
         path: '/dashboard',
@@ -60,12 +65,16 @@ const router = createRouter({
 })
 
 const AUTH_REQUIRED_PREFIXES = ['/dashboard', '/students', '/classes', '/subjects', '/reports', '/settings'];
-const AUTH_PAGES = ['/', '/login', '/register'];
+const AUTH_PAGES = ['/', '/login', '/register', '/verify-email'];
 
 router.beforeEach((to) => {
     const hasToken = tokenStorage.hasAccessToken();
     const isTokenValid = tokenStorage.isAccessTokenValid();
     const isAuthRequiredRoute = AUTH_REQUIRED_PREFIXES.some(prefix => to.path.startsWith(prefix));
+
+    if (to.path === '/verify-email') {
+        return true;
+    }
 
     if (AUTH_PAGES.includes(to.path)) {
         if (isTokenValid) {

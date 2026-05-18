@@ -12,7 +12,7 @@ const route = useRoute()
 const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 
 const form = ref<Record<string, string>>({
-  username: '',
+  email: '',
   password: '',
 })
 
@@ -20,7 +20,7 @@ const loginErrorSummary = ref('')
 const loginFieldErrors = ref<Record<string, string>>({})
 
 const fields: AuthField[] = [
-  { key: 'username', type: 'text', placeholder: 'Username' },
+  { key: 'email', type: 'email', placeholder: 'Email' },
   { key: 'password', type: 'password', placeholder: 'Password' },
 ]
 
@@ -38,14 +38,14 @@ const login = async () => {
     loginFieldErrors.value = {}
 
     const response = await loginApi({
-      username: form.value.username,
+      email: form.value.email,
       password: form.value.password,
     })
 
     tokenStorage.setTokens(
       response.result.accessToken,
       response.result.refreshToken,
-      response.result.user?.username,
+      response.result.user?.email,
     )
 
     toast.value?.show(response.message, 'success')
@@ -68,6 +68,10 @@ const createAccount = () => {
 onMounted(() => {
   if (route.query.expired === '1') {
     toast.value?.show('Thời gian đăng nhập hết hạn', 'error')
+    router.replace('/login')
+  }
+  if (route.query.verify === 'sent') {
+    toast.value?.show('Verification email sent. Please check your inbox.', 'success')
     router.replace('/login')
   }
 })

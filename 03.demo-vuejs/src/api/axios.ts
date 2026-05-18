@@ -8,19 +8,20 @@ export interface ApiResponse<T> {
 }
 
 export interface RegisterRequest {
-    username: string;
+    email: string;
     password: string;
     confirmPassword: string;
 }
 
 export interface LoginRequest {
-    username: string;
+    email: string;
     password: string;
 }
 
 export interface AuthUserResponse {
     id: number;
-    username: string;
+    email: string;
+    emailVerified: boolean;
 }
 
 export interface AuthTokenResponse {
@@ -36,6 +37,15 @@ export interface AuthRefreshRequest {
 export interface AuthRefreshResponse {
     accessToken: string;
     refreshToken: string;
+}
+
+export interface VerifyEmailRequest {
+    selector: string;
+    token: string;
+}
+
+export interface ResendVerificationRequest {
+    email: string;
 }
 
 export interface Student {
@@ -110,13 +120,23 @@ export interface StudentExportRunResponse {
 }
 
 
-export const registerApi = async (data: RegisterRequest): Promise<ApiResponse<AuthTokenResponse>> => {
+export const registerApi = async (data: RegisterRequest): Promise<ApiResponse<null>> => {
     const response = await api.post('/api/auth/register', data);
     return response.data;
 }
 
 export const loginApi = async (data: LoginRequest): Promise<ApiResponse<AuthTokenResponse>> => {
     const response = await api.post('/api/auth/login', data);
+    return response.data;
+}
+
+export const verifyEmailApi = async (data: VerifyEmailRequest): Promise<ApiResponse<null>> => {
+    const response = await api.post('/api/auth/verify-email', data);
+    return response.data;
+}
+
+export const resendVerificationEmailApi = async (data: ResendVerificationRequest): Promise<ApiResponse<null>> => {
+    const response = await api.post('/api/auth/resend-verification-email', data);
     return response.data;
 }
 
