@@ -34,11 +34,16 @@
 
       <label class="filter-field" for="search-birthday">
         <span>Ngày sinh</span>
-        <InputText
+        <DatePicker
           id="search-birthday"
-          v-model="form.birthday"
-          placeholder="YYYY/MM/DD"
-          @keydown.enter="handleSearch"
+          v-model="birthdayDate"
+          class="app-datepicker"
+          date-format="dd/mm/yy"
+          show-icon
+          icon-display="button"
+          placeholder="Chọn ngày sinh"
+          :manual-input="false"
+          show-button-bar
         />
       </label>
 
@@ -51,8 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive, watch } from 'vue'
 import InputText from 'primevue/inputtext'
+import DatePicker from 'primevue/datepicker'
 import type { SearchForm } from '../../types/student'
 
 const emit = defineEmits<{
@@ -60,17 +66,107 @@ const emit = defineEmits<{
   reset: []
 }>()
 
+const SEARCH_DEBOUNCE_MS = 400
+const MIN_TEXT_SEARCH_LENGTH = 2
 const form = reactive<SearchForm>({ code: '', name: '', birthday: '' })
+let searchTimer: number | null = null
+let lastSearchKey = toSearchKey({ code: '', name: '', birthday: '' })
+
+const birthdayDate = computed<Date | null>({
+  get() {
+    return parseDateValue(form.birthday)
+  },
+  set(value) {
+    form.birthday = value ? formatDateValue(value) : ''
+  },
+})
+
+watch(() => [form.code, form.name, form.birthday], scheduleAutoSearch)
+
+onBeforeUnmount(clearSearchTimer)
 
 function handleSearch() {
-  emit('search', { ...form })
+  clearSearchTimer()
+  const payload = buildSearchPayload()
+  lastSearchKey = toSearchKey(payload)
+
+  if (isEmptySearch(payload)) {
+    emit('reset')
+    return
+  }
+
+  emit('search', payload)
 }
 
 function handleReset() {
+  clearSearchTimer()
   form.code = ''
   form.name = ''
   form.birthday = ''
+  lastSearchKey = toSearchKey({ code: '', name: '', birthday: '' })
   emit('reset')
+}
+
+function scheduleAutoSearch() {
+  clearSearchTimer()
+  searchTimer = window.setTimeout(() => {
+    const payload = buildSearchPayload()
+    const nextSearchKey = toSearchKey(payload)
+
+    if (nextSearchKey === lastSearchKey) return
+
+    lastSearchKey = nextSearchKey
+    if (isEmptySearch(payload)) {
+      emit('reset')
+      return
+    }
+
+    emit('search', payload)
+  }, SEARCH_DEBOUNCE_MS)
+}
+
+function clearSearchTimer() {
+  if (searchTimer == null) return
+  window.clearTimeout(searchTimer)
+  searchTimer = null
+}
+
+function buildSearchPayload(): SearchForm {
+  const code = form.code.trim()
+  const name = form.name.trim()
+
+  return {
+    code: code.length >= MIN_TEXT_SEARCH_LENGTH ? code : '',
+    name: name.length >= MIN_TEXT_SEARCH_LENGTH ? name : '',
+    birthday: form.birthday.trim(),
+  }
+}
+
+function isEmptySearch(value: SearchForm) {
+  return !value.code && !value.name && !value.birthday
+}
+
+function toSearchKey(value: SearchForm) {
+  return JSON.stringify(value)
+}
+
+function parseDateValue(value: string) {
+  if (!value) return null
+  const parts = value.split(/[/-]/).map(Number)
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null
+
+  if (String(parts[0]).length === 4) {
+    return new Date(parts[0], parts[1] - 1, parts[2])
+  }
+
+  return new Date(parts[2], parts[1] - 1, parts[0])
+}
+
+function formatDateValue(value: Date) {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 </script>
 

@@ -30,7 +30,7 @@
           </div>
         </label>
 
-        <label class="form-field">
+        <label :class="['form-field', { 'form-field--full': mode === 'add' }]">
           <span>Mã sinh viên</span>
           <div class="input-with-action">
             <InputText v-model="formData.studentCode" disabled class="font-mono" placeholder="SV00001" />
@@ -50,7 +50,15 @@
 
         <label class="form-field">
           <span>Ngày sinh <b>*</b></span>
-          <input v-model="formData.birthday" :class="['native-date', { 'is-invalid': !!errors.birthday }]" type="date" />
+          <DatePicker
+            v-model="birthdayDate"
+            :class="['app-datepicker', { 'is-invalid': !!errors.birthday }]"
+            date-format="dd/mm/yy"
+            show-icon
+            icon-display="button"
+            placeholder="Chọn ngày sinh"
+            :manual-input="false"
+          />
           <small v-if="errors.birthday" class="field-error">{{ errors.birthday }}</small>
         </label>
       </div>
@@ -119,6 +127,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
+import DatePicker from 'primevue/datepicker'
 
 export interface StudentFormData {
   studentId: number | null
@@ -155,6 +164,15 @@ const scorePreview = computed(() => {
   const value = formData.averageScore?.trim()
   if (!value || Number.isNaN(Number(value))) return ''
   return Number(value).toFixed(1)
+})
+
+const birthdayDate = computed<Date | null>({
+  get() {
+    return parseDateValue(formData.birthday)
+  },
+  set(value) {
+    formData.birthday = value ? formatDateValue(value) : ''
+  },
 })
 
 watch(
@@ -198,6 +216,25 @@ function validateForm() {
   }
 
   return Object.keys(errors).length === 0
+}
+
+function parseDateValue(value: string) {
+  if (!value) return null
+  const parts = value.split(/[/-]/).map(Number)
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null
+
+  if (String(parts[0]).length === 4) {
+    return new Date(parts[0], parts[1] - 1, parts[2])
+  }
+
+  return new Date(parts[2], parts[1] - 1, parts[0])
+}
+
+function formatDateValue(value: Date) {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function submitForm() {
@@ -306,6 +343,10 @@ defineExpose({ setStudentCode })
   min-width: 0;
 }
 
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
 .form-field span {
   color: var(--color-text);
   font-size: 13px;
@@ -390,27 +431,6 @@ defineExpose({ setStudentCode })
 .score-preview--poor {
   background: var(--color-danger-soft);
   color: var(--color-danger);
-}
-
-.native-date {
-  width: 100%;
-  min-height: 42px;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
-  outline: none;
-  transition: all var(--transition-fast);
-}
-
-.native-date:hover {
-  border-color: var(--color-border-strong);
-}
-
-.native-date:focus {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-focus);
 }
 
 .academic-note {

@@ -91,6 +91,7 @@ const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 const exportingCsv = ref(false)
 const loading = ref(false)
 const selectedIds = ref<number[]>([])
+let fetchSequence = 0
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
 const sortState = reactive<SortState>({ field: null, order: null })
@@ -104,6 +105,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 async function fetchStudents(page = currentPage.value) {
+  const requestId = ++fetchSequence
   loading.value = true
   try {
     const response = await getStudentsApi({
@@ -116,12 +118,16 @@ async function fetchStudents(page = currentPage.value) {
       sortOrder: sortState.order ?? undefined,
     })
 
+    if (requestId !== fetchSequence) return
+
     students.value = response.result.items
     currentPage.value = response.result.page
     filteredTotal.value = response.result.totalItems
     selectedIds.value = []
+  } catch (error) {
+    if (requestId === fetchSequence) throw error
   } finally {
-    loading.value = false
+    if (requestId === fetchSequence) loading.value = false
   }
 }
 
