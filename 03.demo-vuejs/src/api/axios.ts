@@ -45,6 +45,8 @@ export interface Student {
     birthday: string | null;
     address: string | null;
     score: number | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
 }
 
 export interface StudentPageResponse {
@@ -62,6 +64,18 @@ export interface StudentDetailResponse {
     birthday: string;
     address: string;
     averageScore: number | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+}
+
+export interface ActivityLogResponse {
+    id: number;
+    type: string;
+    title: string;
+    description: string | null;
+    referenceType: string | null;
+    referenceId: number | null;
+    createdAt: string | null;
 }
 
 export interface StudentSearchParams {
@@ -161,5 +175,12 @@ export const deleteStudentApi = async (studentId: number): Promise<ApiResponse<s
 
 export const runStudentExportBatchApi = async (): Promise<ApiResponse<StudentExportRunResponse>> => {
     const response = await api.post('/batch/export-students/run');
+    return response.data;
+}
+
+export const getActivityLogsApi = async (
+    size = 10
+): Promise<ApiResponse<ActivityLogResponse[]>> => {
+    const response = await api.get('/api/activities', { params: { size } });
     return response.data;
 }

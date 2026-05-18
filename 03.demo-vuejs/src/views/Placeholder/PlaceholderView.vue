@@ -1,5 +1,5 @@
 <template>
-  <DashboardLayout :title="pageTitle" :breadcrumb="pageTitle" subtitle="Module đã được đặt trong kiến trúc điều hướng để sẵn sàng mở rộng trong giai đoạn tiếp theo.">
+  <DashboardLayout :title="pageTitle" :breadcrumb="pageTitle">
     <section class="placeholder-panel">
       <div class="placeholder-panel__icon">
         <i :class="icon"></i>

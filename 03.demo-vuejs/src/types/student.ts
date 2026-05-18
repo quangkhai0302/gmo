@@ -5,6 +5,8 @@ export interface Student {
   birthday: string | null
   address: string | null
   score: number | null
+  createdAt?: string | null
+  updatedAt?: string | null
 }
 
 export interface SearchForm {

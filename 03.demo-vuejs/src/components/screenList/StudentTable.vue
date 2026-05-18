@@ -1,12 +1,9 @@
 <template>
-  <div class="table-wrapper">
+  <div ref="tableRoot" class="table-wrapper">
     <div class="table-scroll">
       <table class="data-table">
         <thead>
           <tr>
-            <th class="th th--select">
-              <input type="checkbox" :checked="allSelected" :disabled="!students.length || loading" @change="toggleAll" />
-            </th>
             <th class="th th--no" @click="emitSort('id')">
               <div class="th-inner">STT <SortIcon field="id" :sort="sort" /></div>
             </th>
@@ -34,7 +31,7 @@
         <tbody>
           <template v-if="loading">
             <tr v-for="row in 6" :key="row" class="tr">
-              <td v-for="cell in 8" :key="cell" class="td">
+              <td v-for="cell in 7" :key="cell" class="td">
                 <span class="skeleton"></span>
               </td>
             </tr>
@@ -42,9 +39,6 @@
 
           <template v-else-if="students.length > 0">
             <tr v-for="(student, index) in students" :key="student.id" class="tr">
-              <td class="td td--select">
-                <input type="checkbox" :checked="selectedIds.includes(student.id)" @change="toggleRow(student.id)" />
-              </td>
               <td class="td td--no">{{ startIndex + index + 1 }}</td>
               <td class="td">
                 <span class="code-badge">{{ student.code }}</span>
@@ -91,7 +85,7 @@
           </template>
 
           <tr v-else>
-            <td colspan="8" class="empty-cell">
+            <td colspan="7" class="empty-cell">
               <div class="empty-state">
                 <div class="empty-state__icon">
                   <i class="pi pi-search"></i>
@@ -108,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { Student, SortState, StudentSortField } from '../../types/student'
 import SortIcon from '../../components/screenList/SortIcon.vue'
 
@@ -117,40 +111,47 @@ const props = withDefaults(defineProps<{
   sort: SortState
   startIndex: number
   loading?: boolean
-  selectedIds?: number[]
 }>(), {
   loading: false,
-  selectedIds: () => [],
 })
 
 const emit = defineEmits<{
   sort: [field: StudentSortField]
   requestEdit: [id: number]
   requestDelete: [student: Student]
-  selectionChange: [ids: number[]]
 }>()
 
 const openMenuId = ref<number | null>(null)
-const allSelected = computed(() => props.students.length > 0 && props.students.every((student) => props.selectedIds.includes(student.id)))
+const tableRoot = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleDocumentPointerDown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleDocumentPointerDown)
+})
 
 function emitSort(field: StudentSortField) {
   if (!props.loading) emit('sort', field)
 }
 
-function toggleAll(event: Event) {
-  const checked = (event.target as HTMLInputElement).checked
-  emit('selectionChange', checked ? props.students.map((student) => student.id) : [])
-}
-
-function toggleRow(id: number) {
-  const next = props.selectedIds.includes(id)
-    ? props.selectedIds.filter((selectedId) => selectedId !== id)
-    : [...props.selectedIds, id]
-  emit('selectionChange', next)
-}
-
 function toggleMenu(id: number) {
   openMenuId.value = openMenuId.value === id ? null : id
+}
+
+function handleDocumentPointerDown(event: PointerEvent) {
+  if (openMenuId.value == null) return
+
+  const target = event.target
+  if (!(target instanceof Element)) return
+
+  const rowActions = target.closest('.row-actions')
+  const clickedInsideRowActions = !!rowActions && !!tableRoot.value?.contains(rowActions)
+
+  if (clickedInsideRowActions) return
+
+  openMenuId.value = null
 }
 
 function shouldOpenMenuUp(index: number) {
@@ -241,12 +242,6 @@ function formatScore(score: number | null | undefined) {
   background: #f1f5f9;
 }
 
-.th--select,
-.td--select {
-  width: 48px;
-  text-align: center;
-}
-
 .th--no {
   width: 76px;
 }
@@ -305,13 +300,6 @@ function formatScore(score: number | null | undefined) {
 .td--score,
 .td--actions {
   text-align: center;
-}
-
-input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
 }
 
 .student-identity {

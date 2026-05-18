@@ -1,15 +1,15 @@
 <template>
   <aside :class="['app-sidebar', { 'app-sidebar--collapsed': collapsed, 'app-sidebar--open': mobileOpen }]">
     <div class="app-sidebar__brand">
-      <RouterLink to="/dashboard" class="app-sidebar__logo" @click="$emit('closeMobile')">
+      <RouterLink to="/dashboard" class="app-sidebar__logo" @click="handleLogoClick">
         <span class="app-sidebar__mark">
           <i class="pi pi-graduation-cap"></i>
         </span>
         <span class="app-sidebar__brand-text">StudentOS</span>
       </RouterLink>
 
-      <button class="app-sidebar__collapse" type="button" title="Thu gọn menu" @click="$emit('toggleCollapse')">
-        <i :class="collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+      <button class="app-sidebar__collapse" type="button" :title="collapseButtonTitle" @click="handleCollapseClick">
+        <i :class="collapseButtonIcon"></i>
       </button>
     </div>
 
@@ -29,13 +29,10 @@
     </nav>
 
     <div class="app-sidebar__footer">
-      <div class="app-sidebar__workspace">
-        <span class="app-sidebar__workspace-dot"></span>
-        <div>
-          <strong>Enterprise</strong>
-          <small>Academic Suite</small>
-        </div>
-      </div>
+      <button class="app-sidebar__theme-toggle" type="button" :title="themeToggleTitle" @click="cycleTheme">
+        <i :class="currentThemeOption.icon"></i>
+        <span>{{ currentThemeOption.label }}</span>
+      </button>
     </div>
   </aside>
 
@@ -43,12 +40,20 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed, ref } from 'vue'
+import {
+  applyThemePreference,
+  getStoredThemePreference,
+  setStoredThemePreference,
+  type ThemePreference,
+} from '@/utils/theme'
+
+const props = defineProps<{
   collapsed: boolean
   mobileOpen: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   toggleCollapse: []
   closeMobile: []
 }>()
@@ -61,6 +66,59 @@ const menuItems = [
   { label: 'Báo cáo', icon: 'pi pi-chart-bar', path: '/reports' },
   { label: 'Cài đặt', icon: 'pi pi-cog', path: '/settings' },
 ]
+
+const themeOptions: Array<{ value: ThemePreference; label: string; icon: string }> = [
+  { value: 'light', label: 'Sáng', icon: 'pi pi-sun' },
+  { value: 'dark', label: 'Tối', icon: 'pi pi-moon' },
+  { value: 'system', label: 'Hệ thống', icon: 'pi pi-desktop' },
+]
+
+const themePreference = ref<ThemePreference>(getStoredThemePreference())
+
+const collapseButtonTitle = computed(() => {
+  if (props.mobileOpen) return 'Đóng menu'
+  return props.collapsed ? 'Mở rộng menu' : 'Thu gọn menu'
+})
+
+const collapseButtonIcon = computed(() => {
+  if (props.mobileOpen) return 'pi pi-times'
+  return props.collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'
+})
+
+const currentThemeOption = computed(() =>
+  themeOptions.find((option) => option.value === themePreference.value) ?? themeOptions[2],
+)
+
+const themeToggleTitle = computed(() => `Giao diện: ${currentThemeOption.value.label}`)
+
+function handleCollapseClick() {
+  if (props.mobileOpen) {
+    emit('closeMobile')
+    return
+  }
+
+  emit('toggleCollapse')
+}
+
+function cycleTheme() {
+  const currentIndex = themeOptions.findIndex((option) => option.value === themePreference.value)
+  const nextPreference = themeOptions[(currentIndex + 1) % themeOptions.length].value
+
+  themePreference.value = nextPreference
+  setStoredThemePreference(nextPreference)
+}
+
+function handleLogoClick(event: MouseEvent) {
+  if (props.collapsed) {
+    event.preventDefault()
+    emit('toggleCollapse')
+    return
+  }
+
+  emit('closeMobile')
+}
+
+applyThemePreference(themePreference.value)
 </script>
 
 <style scoped>
@@ -82,6 +140,7 @@ const menuItems = [
 }
 
 .app-sidebar__brand {
+  position: relative;
   height: 72px;
   display: flex;
   align-items: center;
@@ -120,6 +179,9 @@ const menuItems = [
 .app-sidebar__collapse {
   width: 32px;
   height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: var(--radius-md);
   background: rgba(15, 23, 42, 0.78);
@@ -187,6 +249,36 @@ const menuItems = [
   padding: var(--space-lg);
 }
 
+.app-sidebar__theme-toggle {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.62);
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.app-sidebar__theme-toggle i {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #93c5fd;
+}
+
+.app-sidebar__theme-toggle:hover {
+  color: #ffffff;
+  border-color: rgba(20, 184, 166, 0.36);
+  background: rgba(20, 184, 166, 0.16);
+}
+
 .app-sidebar__workspace {
   display: flex;
   align-items: center;
@@ -221,15 +313,48 @@ const menuItems = [
 }
 
 .app-sidebar--collapsed .app-sidebar__brand {
+  height: 72px;
   justify-content: center;
   padding: 0 var(--space-md);
 }
 
 .app-sidebar--collapsed .app-sidebar__brand-text,
 .app-sidebar--collapsed .app-sidebar__item span,
-.app-sidebar--collapsed .app-sidebar__workspace div,
-.app-sidebar--collapsed .app-sidebar__collapse {
+.app-sidebar--collapsed .app-sidebar__theme-toggle span,
+.app-sidebar--collapsed .app-sidebar__workspace div {
   display: none;
+}
+
+.app-sidebar--collapsed .app-sidebar__collapse {
+  position: absolute;
+  top: 50%;
+  right: -16px;
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  transform: translateY(-50%);
+  border-color: rgba(148, 163, 184, 0.22);
+  border-radius: var(--radius-round);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+}
+
+.app-sidebar--collapsed .app-sidebar__collapse:hover {
+  border-color: rgba(20, 184, 166, 0.42);
+  background: var(--color-surface);
+  color: var(--color-primary-hover);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+}
+
+.app-sidebar--collapsed .app-sidebar__logo {
+  justify-content: center;
+}
+
+.app-sidebar--collapsed .app-sidebar__mark {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 10px 22px rgba(20, 184, 166, 0.22);
 }
 
 .app-sidebar--collapsed .app-sidebar__item {
@@ -239,6 +364,15 @@ const menuItems = [
 
 .app-sidebar--collapsed .app-sidebar__workspace {
   justify-content: center;
+}
+
+.app-sidebar--collapsed .app-sidebar__footer {
+  padding: var(--space-md);
+}
+
+.app-sidebar--collapsed .app-sidebar__theme-toggle {
+  justify-content: center;
+  padding: 0;
 }
 
 .app-sidebar__scrim {
@@ -259,14 +393,45 @@ const menuItems = [
     width: 280px;
   }
 
+  .app-sidebar--collapsed .app-sidebar__brand {
+    height: 72px;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 var(--space-lg);
+  }
+
   .app-sidebar--collapsed .app-sidebar__brand-text,
   .app-sidebar--collapsed .app-sidebar__item span,
+  .app-sidebar--collapsed .app-sidebar__theme-toggle span,
   .app-sidebar--collapsed .app-sidebar__workspace div {
     display: block;
   }
 
+  .app-sidebar--collapsed .app-sidebar__item {
+    justify-content: flex-start;
+    padding: 0 var(--space-md);
+  }
+
+  .app-sidebar--collapsed .app-sidebar__logo {
+    justify-content: flex-start;
+  }
+
+  .app-sidebar--collapsed .app-sidebar__theme-toggle {
+    justify-content: flex-start;
+    padding: 0 var(--space-md);
+  }
+
   .app-sidebar--collapsed .app-sidebar__collapse {
-    display: none;
+    position: static;
+    transform: none;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    border-color: rgba(148, 163, 184, 0.18);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.78);
+    color: var(--color-sidebar-muted);
+    box-shadow: none;
   }
 
   .app-sidebar__scrim {

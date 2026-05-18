@@ -6,9 +6,12 @@ import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
 import router from './router'
+import { initializeTheme } from './utils/theme'
 
 import './style.css'
 import 'primeicons/primeicons.css'
+
+initializeTheme()
 
 const app = createApp(App).use(router)
 

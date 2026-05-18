@@ -26,10 +26,6 @@
         </div>
 
         <div class="student-card__actions">
-          <div v-if="selectedIds.length" class="bulk-bar">
-            <span>{{ selectedIds.length }} đã chọn</span>
-            <button type="button" @click="selectedIds = []">Bỏ chọn</button>
-          </div>
           <button class="icon-action" type="button" title="Làm mới" @click="fetchStudents(currentPage)">
             <i class="pi pi-refresh"></i>
           </button>
@@ -41,9 +37,7 @@
         :sort="sortState"
         :start-index="startIndex"
         :loading="loading"
-        :selected-ids="selectedIds"
         @sort="handleSort"
-        @selectionChange="selectedIds = $event"
         @requestEdit="handleRequestEdit"
         @requestDelete="openDeleteDialog"
       />
@@ -90,7 +84,6 @@ const filteredTotal = ref(0)
 const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 const exportingCsv = ref(false)
 const loading = ref(false)
-const selectedIds = ref<number[]>([])
 let fetchSequence = 0
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
@@ -123,7 +116,6 @@ async function fetchStudents(page = currentPage.value) {
     students.value = response.result.items
     currentPage.value = response.result.page
     filteredTotal.value = response.result.totalItems
-    selectedIds.value = []
   } catch (error) {
     if (requestId === fetchSequence) throw error
   } finally {
@@ -293,28 +285,6 @@ function extractFileName(path: string) {
   gap: var(--space-md);
 }
 
-.bulk-bar {
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: 0 var(--space-md);
-  border: 1px solid rgba(20, 184, 166, 0.24);
-  border-radius: var(--radius-md);
-  background: var(--color-primary-subtle);
-  color: var(--color-primary-hover);
-  font-size: 13px;
-  font-weight: var(--font-weight-bold);
-}
-
-.bulk-bar button {
-  border: 0;
-  background: transparent;
-  color: var(--color-primary-hover);
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-}
-
 .icon-action {
   width: 38px;
   height: 38px;
@@ -338,8 +308,7 @@ function extractFileName(path: string) {
     flex-direction: column;
   }
 
-  .student-card__actions,
-  .bulk-bar {
+  .student-card__actions {
     width: 100%;
     justify-content: space-between;
   }

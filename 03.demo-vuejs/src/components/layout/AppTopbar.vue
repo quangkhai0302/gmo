@@ -16,17 +16,12 @@
     </div>
 
     <div class="app-topbar__right">
-      <label class="app-topbar__search">
-        <i class="pi pi-search"></i>
-        <input type="search" placeholder="Tìm nhanh sinh viên, lớp học..." />
-      </label>
-
       <button class="app-topbar__icon-btn" type="button" aria-label="Thông báo">
         <i class="pi pi-bell"></i>
         <span></span>
       </button>
 
-      <div class="app-topbar__account">
+      <div ref="accountRoot" class="app-topbar__account">
         <button class="app-topbar__profile" type="button" @click="accountOpen = !accountOpen">
           <span class="app-topbar__avatar">{{ initials }}</span>
           <span class="app-topbar__user">
@@ -58,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { tokenStorage } from '@/utils/tokenStorage'
 
@@ -73,6 +68,7 @@ defineEmits<{
 
 const router = useRouter()
 const accountOpen = ref(false)
+const accountRoot = ref<HTMLElement | null>(null)
 const username = computed(() => tokenStorage.getUserName() || 'Admin')
 const initials = computed(() =>
   username.value
@@ -82,6 +78,24 @@ const initials = computed(() =>
     .toUpperCase()
     .slice(0, 2),
 )
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleDocumentPointerDown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleDocumentPointerDown)
+})
+
+function handleDocumentPointerDown(event: PointerEvent) {
+  if (!accountOpen.value) return
+
+  const target = event.target
+  if (!(target instanceof Node)) return
+  if (accountRoot.value?.contains(target)) return
+
+  accountOpen.value = false
+}
 
 async function handleLogout() {
   await tokenStorage.logout()
@@ -100,7 +114,7 @@ async function handleLogout() {
   justify-content: space-between;
   gap: var(--space-xl);
   padding: 0 var(--space-2xl);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--color-topbar-bg);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-xs);
   backdrop-filter: blur(12px);
@@ -152,36 +166,6 @@ async function handleLogout() {
   line-height: 1.25;
   letter-spacing: 0;
   color: var(--color-text);
-}
-
-.app-topbar__search {
-  width: min(340px, 28vw);
-  min-width: 240px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: 0 var(--space-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
-  color: var(--color-text-muted);
-  transition: all var(--transition-fast);
-}
-
-.app-topbar__search:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-focus);
-  background: var(--color-surface);
-}
-
-.app-topbar__search input {
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--color-text);
-  font-size: 14px;
 }
 
 .app-topbar__icon-btn {
@@ -301,12 +285,6 @@ async function handleLogout() {
 .account-menu-leave-to {
   opacity: 0;
   transform: translateY(-6px);
-}
-
-@media (max-width: 1180px) {
-  .app-topbar__search {
-    display: none;
-  }
 }
 
 @media (max-width: 960px) {

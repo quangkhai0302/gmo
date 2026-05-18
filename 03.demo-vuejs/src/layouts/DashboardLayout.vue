@@ -3,12 +3,12 @@
     <AppSidebar
       :collapsed="sidebarCollapsed"
       :mobile-open="mobileSidebarOpen"
-      @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
+      @toggle-collapse="toggleSidebarCollapse"
       @close-mobile="mobileSidebarOpen = false"
     />
 
     <div class="dashboard-shell__body">
-      <AppTopbar :title="title" :breadcrumb="breadcrumb" @toggle-mobile="mobileSidebarOpen = true" />
+      <AppTopbar :title="title" :breadcrumb="breadcrumb" @toggle-mobile="openMobileSidebar" />
 
       <main class="dashboard-shell__content">
         <div class="dashboard-shell__page">
@@ -32,9 +32,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppTopbar from '@/components/layout/AppTopbar.vue'
+
+const SIDEBAR_COLLAPSED_STORAGE_KEY = 'student-management.sidebarCollapsed'
 
 defineProps<{
   title: string
@@ -43,8 +46,38 @@ defineProps<{
   subtitle?: string
 }>()
 
-const sidebarCollapsed = ref(false)
+const route = useRoute()
+const sidebarCollapsed = ref(readSidebarCollapsedState())
 const mobileSidebarOpen = ref(false)
+
+watch(() => route.fullPath, () => {
+  mobileSidebarOpen.value = false
+})
+
+function toggleSidebarCollapse() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  writeSidebarCollapsedState(sidebarCollapsed.value)
+}
+
+function openMobileSidebar() {
+  mobileSidebarOpen.value = true
+}
+
+function readSidebarCollapsedState() {
+  try {
+    return window.localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+function writeSidebarCollapsedState(value: boolean) {
+  try {
+    window.localStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, String(value))
+  } catch {
+    // Ignore unavailable storage in restricted browser contexts.
+  }
+}
 </script>
 
 <style scoped>
