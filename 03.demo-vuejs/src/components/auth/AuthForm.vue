@@ -32,6 +32,8 @@ type NewType = {
     // layout
     actionsInline?: boolean
 
+    submitLoading?: boolean
+
     // 
     buttonOrderReversed?: boolean
 }
@@ -106,6 +108,8 @@ const updateField = (key: string, value?: string) => {
       <div :class="['auth-actions', { 'auth-actions--inline': actionsInline }]">
         <Button
           :label="firstSubmitLabel"
+          :loading="submitLoading"
+          :disabled="submitLoading"
           :class="['auth-btn-primary', firstButtonClass]"
           @click="emit('firstSubmitButton')"
         />
@@ -114,6 +118,7 @@ const updateField = (key: string, value?: string) => {
           v-if="secondSubmitLabel"
           :label="secondSubmitLabel"
           text
+          :disabled="submitLoading"
           :class="['auth-btn-secondary', secondButtonClass]"
           @click="emit('secondSubmitButton')"
         />
