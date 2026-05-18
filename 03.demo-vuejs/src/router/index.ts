@@ -1,5 +1,7 @@
 import Login from "../views/Auth/Login.vue";
 import Register from "../views/Auth/Register.vue";
+import DashboardView from "../views/Dashboard/DashboardView.vue";
+import PlaceholderView from "../views/Placeholder/PlaceholderView.vue";
 import ScreenList from "../views/ScreenList/ScreenList.vue";
 import StudentDetail from "../views/ScreenList/StudentDetail.vue";
 import { tokenStorage } from "@/utils/tokenStorage";
@@ -19,6 +21,10 @@ const routes = [
         component: Register
     },
     {
+        path: '/dashboard',
+        component: DashboardView
+    },
+    {
         path: '/students',
         component: ScreenList
     },
@@ -29,6 +35,22 @@ const routes = [
     {
         path: '/students/:id/edit',
         component: StudentDetail
+    },
+    {
+        path: '/classes',
+        component: PlaceholderView
+    },
+    {
+        path: '/subjects',
+        component: PlaceholderView
+    },
+    {
+        path: '/reports',
+        component: PlaceholderView
+    },
+    {
+        path: '/settings',
+        component: PlaceholderView
     }
 ]
 
@@ -37,7 +59,7 @@ const router = createRouter({
     routes
 })
 
-const AUTH_REQUIRED_PREFIXES = ['/students'];
+const AUTH_REQUIRED_PREFIXES = ['/dashboard', '/students', '/classes', '/subjects', '/reports', '/settings'];
 const AUTH_PAGES = ['/', '/login', '/register'];
 
 router.beforeEach((to) => {
@@ -47,7 +69,7 @@ router.beforeEach((to) => {
 
     if (AUTH_PAGES.includes(to.path)) {
         if (isTokenValid) {
-            return { path: '/students' };
+            return { path: '/dashboard' };
         }
 
         if (hasToken) {

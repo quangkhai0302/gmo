@@ -1,48 +1,53 @@
 <template>
-  <div class="search-card">
-    <div class="search-card__grid">
-      <!-- Student Code -->
-      <div class="search-field">
-        <label class="search-field__label" for="search-student-code">Student Code</label>
+  <section class="filter-panel">
+    <div class="filter-panel__header">
+      <div>
+        <h2>Bộ lọc dữ liệu</h2>
+        <p>Tìm nhanh theo mã sinh viên, họ tên hoặc ngày sinh.</p>
+      </div>
+      <button class="filter-panel__reset" type="button" @click="handleReset">
+        <i class="pi pi-filter-slash"></i>
+        Xóa lọc
+      </button>
+    </div>
+
+    <div class="filter-panel__grid">
+      <label class="filter-field" for="search-student-code">
+        <span>Mã sinh viên</span>
         <InputText
           id="search-student-code"
           v-model="form.code"
-          placeholder="Enter Student Code"
-          class="search-field__input"
+          placeholder="Ví dụ: SV0001"
+          @keydown.enter="handleSearch"
         />
-      </div>
+      </label>
 
-      <!-- Student Name -->
-      <div class="search-field">
-        <label class="search-field__label" for="search-name">Student Name</label>
+      <label class="filter-field" for="search-name">
+        <span>Họ và tên</span>
         <InputText
           id="search-name"
           v-model="form.name"
-          placeholder="Enter student name"
-          class="search-field__input"
+          placeholder="Nhập tên sinh viên"
+          @keydown.enter="handleSearch"
         />
-      </div>
+      </label>
 
-      <!-- Birthday -->
-      <div class="search-field">
-        <label class="search-field__label" for="search-birthday">Birthday (YYYY/MM/DD)</label>
+      <label class="filter-field" for="search-birthday">
+        <span>Ngày sinh</span>
         <InputText
           id="search-birthday"
           v-model="form.birthday"
           placeholder="YYYY/MM/DD"
-          class="search-field__input"
+          @keydown.enter="handleSearch"
         />
-      </div>
+      </label>
 
-      <!-- Search Button -->
-      <div class="search-field search-field--btn">
-        <button class="search-btn" @click="handleSearch">
-          <i class="pi pi-search"></i>
-          Search
-        </button>
-      </div>
+      <button class="app-button app-button--primary filter-panel__submit" type="button" @click="handleSearch">
+        <i class="pi pi-search"></i>
+        Tìm kiếm
+      </button>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -50,91 +55,123 @@ import { reactive } from 'vue'
 import InputText from 'primevue/inputtext'
 import type { SearchForm } from '../../types/student'
 
-const emit = defineEmits<{ search: [form: SearchForm] }>()
+const emit = defineEmits<{
+  search: [form: SearchForm]
+  reset: []
+}>()
 
 const form = reactive<SearchForm>({ code: '', name: '', birthday: '' })
+
 function handleSearch() {
   emit('search', { ...form })
+}
+
+function handleReset() {
+  form.code = ''
+  form.name = ''
+  form.birthday = ''
+  emit('reset')
 }
 </script>
 
 <style scoped>
-.search-card {
-  background: var(--color-surface-card);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl) var(--space-xl);
+.filter-panel {
   margin-bottom: var(--space-xl);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
   box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-border-light);
 }
 
-.search-card__grid {
+.filter-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.filter-panel__header h2 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.filter-panel__header p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.filter-panel__reset {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-panel__reset:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.filter-panel__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
   gap: var(--space-lg);
   align-items: end;
 }
 
-.search-field {
+.filter-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
-.search-field--btn {
-  justify-content: flex-end;
-}
-
-.search-field__label {
-  font-size: 0.75rem;
+.filter-field span {
+  color: var(--color-text);
+  font-size: 13px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary-dark);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
-/* Inputs inherit global PrimeVue overrides (cream bg, teal focus) */
-
-/* Search Button — Teal pill */
-.search-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  width: 100%;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  border: none;
-  border-radius: var(--radius-round);
-  color: var(--color-text-on-primary);
-  font-size: 15px;
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: all var(--transition-bounce);
-  font-family: var(--font-family);
-  box-shadow: var(--shadow-teal-glow);
-  letter-spacing: 0.01em;
+.filter-panel__submit {
+  min-width: 132px;
 }
 
-.search-btn:hover {
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(43, 168, 162, 0.4);
+@media (max-width: 1024px) {
+  .filter-panel__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-panel__submit {
+    width: 100%;
+  }
 }
 
-.search-btn:active {
-  transform: scale(0.95);
-  box-shadow: var(--shadow-teal-glow);
-}
-
-/* Responsive */
 @media (max-width: 640px) {
-  .search-card {
+  .filter-panel {
     padding: var(--space-lg);
   }
 
-  .search-card__grid {
+  .filter-panel__header,
+  .filter-panel__grid {
     grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .filter-panel__reset {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

@@ -49,7 +49,7 @@ const login = async () => {
     )
 
     toast.value?.show(response.message, 'success')
-    router.push('/students')
+    router.push('/dashboard')
   } catch (error) {
     const mapped = getLoginErrorMessage(error)
     loginErrorSummary.value = mapped.summary

@@ -374,4 +374,64 @@ const updateField = (key: string, value?: string) => {
     width: 100%;
   }
 }
+
+.auth-wrapper {
+  background: radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.14), transparent 34%), var(--color-background);
+}
+
+.auth-card {
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.auth-logo__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: #ffffff;
+  font-size: 1.25rem;
+}
+
+.auth-logo__text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-title {
+  color: var(--color-text);
+  letter-spacing: 0;
+}
+
+.auth-btn-primary.p-button {
+  border-radius: var(--radius-md) !important;
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  box-shadow: var(--shadow-teal-glow) !important;
+  letter-spacing: 0;
+}
+
+.auth-btn-primary.p-button:hover {
+  background: var(--color-primary-hover) !important;
+  box-shadow: 0 10px 22px rgba(20, 184, 166, 0.24) !important;
+  transform: translateY(-1px);
+}
+
+.auth-btn-primary.p-button:active {
+  transform: translateY(0);
+}
+
+.auth-error-box,
+:deep(.p-inputtext.auth-input.auth-input--invalid),
+.auth-password :deep(.p-password-input.auth-input.auth-input--invalid) {
+  border-color: var(--color-danger);
+}
+
+.auth-field-error,
+.auth-error-box,
+.auth-error-box i {
+  color: var(--color-danger);
+}
 </style>

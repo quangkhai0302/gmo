@@ -50,7 +50,7 @@ const register = async () => {
     )
 
     toast.value?.show(response.message, 'success')
-    router.push('/students')
+    router.push('/dashboard')
   } catch (error) {
     const mapped = getRegisterErrorMessage(error)
     registerErrorSummary.value = mapped.summary

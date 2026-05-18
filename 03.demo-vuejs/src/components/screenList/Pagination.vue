@@ -1,30 +1,28 @@
 <template>
   <div class="pagination" v-if="totalPages > 0">
+    <p class="pagination__summary">
+      Hiển thị <strong>{{ startItem }}-{{ endItem }}</strong> trên <strong>{{ totalItems }}</strong> hồ sơ
+    </p>
+
     <div class="pagination__controls">
-      <button class="page-btn page-btn--nav" :disabled="currentPage === 1"
-        @click="$emit('changePage', 1)" title="First page">
+      <button class="page-btn" :disabled="currentPage === 1" title="Trang đầu" @click="$emit('changePage', 1)">
         <i class="pi pi-angle-double-left"></i>
       </button>
-      <button class="page-btn page-btn--nav" :disabled="currentPage === 1"
-        @click="$emit('changePage', currentPage - 1)" title="Previous page">
+      <button class="page-btn" :disabled="currentPage === 1" title="Trang trước" @click="$emit('changePage', currentPage - 1)">
         <i class="pi pi-angle-left"></i>
       </button>
 
       <template v-for="page in visiblePages" :key="page">
-        <span v-if="page === '...'" class="page-dots">···</span>
-        <button v-else
-          :class="['page-btn', { 'page-btn--active': page === currentPage }]"
-          @click="$emit('changePage', page as number)">
+        <span v-if="page === '...'" class="page-dots">...</span>
+        <button v-else :class="['page-btn', { 'page-btn--active': page === currentPage }]" @click="$emit('changePage', page as number)">
           {{ page }}
         </button>
       </template>
 
-      <button class="page-btn page-btn--nav" :disabled="currentPage === totalPages"
-        @click="$emit('changePage', currentPage + 1)" title="Next page">
+      <button class="page-btn" :disabled="currentPage === totalPages" title="Trang sau" @click="$emit('changePage', currentPage + 1)">
         <i class="pi pi-angle-right"></i>
       </button>
-      <button class="page-btn page-btn--nav" :disabled="currentPage === totalPages"
-        @click="$emit('changePage', totalPages)" title="Last page">
+      <button class="page-btn" :disabled="currentPage === totalPages" title="Trang cuối" @click="$emit('changePage', totalPages)">
         <i class="pi pi-angle-double-right"></i>
       </button>
     </div>
@@ -42,15 +40,24 @@ const props = defineProps<{
 defineEmits<{ changePage: [page: number] }>()
 
 const totalPages = computed(() => Math.ceil(props.totalItems / props.pageSize))
+const startItem = computed(() => (props.currentPage - 1) * props.pageSize + 1)
+const endItem = computed(() => Math.min(props.currentPage * props.pageSize, props.totalItems))
 
 const visiblePages = computed((): (number | '...')[] => {
-  const total = totalPages.value, current = props.currentPage, delta = 2
+  const total = totalPages.value
+  const current = props.currentPage
   const pages: (number | '...')[] = []
-  if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); return pages }
+
+  if (total <= 7) {
+    for (let index = 1; index <= total; index += 1) pages.push(index)
+    return pages
+  }
+
   pages.push(1)
-  const left = Math.max(2, current - delta), right = Math.min(total - 1, current + delta)
+  const left = Math.max(2, current - 2)
+  const right = Math.min(total - 1, current + 2)
   if (left > 2) pages.push('...')
-  for (let i = left; i <= right; i++) pages.push(i)
+  for (let index = left; index <= right; index += 1) pages.push(index)
   if (right < total - 1) pages.push('...')
   pages.push(total)
   return pages
@@ -61,66 +68,77 @@ const visiblePages = computed((): (number | '...')[] => {
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 14px 20px;
-  border-top: 1px solid var(--color-border-light);
-  flex-wrap: wrap;
-  gap: 10px;
-  background: var(--color-surface-card);
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.pagination__summary {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.pagination__summary strong {
+  color: var(--color-text);
 }
 
 .pagination__controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .page-btn {
   min-width: 36px;
   height: 36px;
-  padding: 0 8px;
-  border: 1.5px solid var(--color-border);
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface-card);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: 13px;
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-bounce);
-  font-family: var(--font-family);
+  transition: all var(--transition-fast);
 }
 
 .page-btn:hover:not(:disabled):not(.page-btn--active) {
-  background: var(--color-primary-bg);
-  border-color: rgba(43, 168, 162, 0.3);
-  color: var(--color-primary-dark);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
 }
 
 .page-btn--active {
-  background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-on-primary);
-  box-shadow: var(--shadow-teal-glow);
-}
-
-.page-btn--active:hover {
-  background: var(--color-primary-dark);
+  background: var(--color-primary);
+  color: #ffffff;
 }
 
 .page-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .page-dots {
-  padding: 0 6px;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
+  min-width: 28px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
-  height: 36px;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 720px) {
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination__controls {
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
 }
 </style>

@@ -1,122 +1,124 @@
 <template>
-  <div class="detail-card">
-    <div class="detail-card__header">
-      <h2 class="detail-card__title">{{ mode === 'edit' ? 'Edit Student' : 'Add Student' }}</h2>
-      <span class="detail-card__subtitle">
-        {{ mode === 'edit' ? 'Update the details for the existing student.' : 'Fill in the forms below to register a new student.' }}
-      </span>
+  <form class="student-form" @submit.prevent="submitForm">
+    <div class="student-form__header">
+      <div>
+        <span>{{ mode === 'edit' ? 'Edit record' : 'New record' }}</span>
+        <h2>{{ mode === 'edit' ? 'Thông tin sinh viên' : 'Tạo hồ sơ sinh viên' }}</h2>
+        <p>Thông tin được chia theo nhóm để dễ rà soát trước khi lưu vào hệ thống.</p>
+      </div>
+      <button class="app-button app-button--secondary" type="button" @click="$emit('back')">
+        <i class="pi pi-arrow-left"></i>
+        Quay lại
+      </button>
     </div>
 
-    <form @submit.prevent="submitForm" class="detail-form">
-      
-      <!-- Student ID: Only in edit mode -->
-      <div v-if="mode === 'edit'" class="form-field">
-        <label for="studentId">Student ID</label>
-        <div class="readonly-box">
-          <i class="pi pi-lock"></i>
-          {{ formData.studentId }}
+    <section class="form-section">
+      <div class="form-section__title">
+        <i class="pi pi-user"></i>
+        <div>
+          <h3>Thông tin cá nhân</h3>
+          <p>Dữ liệu nhận diện cơ bản của sinh viên.</p>
         </div>
       </div>
 
-      <!-- Student Code -->
-      <div class="form-field">
-        <label for="studentCode">Student Code</label>
-        <div class="input-with-action">
-          <InputText
-            id="studentCode"
-            v-model="formData.studentCode"
-            disabled
-            class="form-input font-mono"
-            placeholder="e.g. STU12345"
-          />
-          <Button
-            v-if="mode === 'add'"
-            type="button"
-            label="Generate Code"
-            icon="pi pi-bolt"
-            @click="generateCode"
-            severity="secondary"
-            class="generate-btn"
-          />
+      <div class="form-grid">
+        <label v-if="mode === 'edit'" class="form-field">
+          <span>ID hệ thống</span>
+          <div class="readonly-box">
+            <i class="pi pi-lock"></i>
+            {{ formData.studentId }}
+          </div>
+        </label>
+
+        <label class="form-field">
+          <span>Mã sinh viên</span>
+          <div class="input-with-action">
+            <InputText v-model="formData.studentCode" disabled class="font-mono" placeholder="SV00001" />
+            <button v-if="mode === 'add'" class="app-button app-button--outline" type="button" @click="$emit('generateCode')">
+              <i class="pi pi-bolt"></i>
+              Tạo mã
+            </button>
+          </div>
+          <small>Mã sinh viên được sinh tự động để tránh trùng lặp.</small>
+        </label>
+
+        <label class="form-field">
+          <span>Họ và tên <b>*</b></span>
+          <InputText v-model="formData.studentName" :class="{ 'is-invalid': !!errors.studentName }" placeholder="Nhập họ tên đầy đủ" />
+          <small v-if="errors.studentName" class="field-error">{{ errors.studentName }}</small>
+        </label>
+
+        <label class="form-field">
+          <span>Ngày sinh <b>*</b></span>
+          <input v-model="formData.birthday" :class="['native-date', { 'is-invalid': !!errors.birthday }]" type="date" />
+          <small v-if="errors.birthday" class="field-error">{{ errors.birthday }}</small>
+        </label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="form-section__title">
+        <i class="pi pi-chart-line"></i>
+        <div>
+          <h3>Thông tin học tập</h3>
+          <p>Theo dõi điểm trung bình và trạng thái học vụ.</p>
         </div>
       </div>
 
-      <!-- Student Name -->
-      <div class="form-field">
-        <label for="studentName">Student Name</label>
-        <InputText
-          id="studentName"
-          v-model="formData.studentName"
-          placeholder="Enter student name"
-          class="form-input"
-        />
-      </div>
+      <div class="form-grid form-grid--two">
+        <label class="form-field">
+          <span>Điểm trung bình</span>
+          <div class="score-wrapper">
+            <InputText
+              v-model="formData.averageScore"
+              :class="{ 'is-invalid': !!errors.averageScore }"
+              inputmode="decimal"
+              placeholder="0.0 - 10.0"
+            />
+            <span v-if="scorePreview" :class="['score-preview', scoreClass(Number(formData.averageScore))]">{{ scorePreview }}</span>
+          </div>
+          <small v-if="errors.averageScore" class="field-error">{{ errors.averageScore }}</small>
+          <small v-else>Để trống nếu chưa có điểm tổng kết.</small>
+        </label>
 
-      <!-- Birthday -->
-      <div class="form-field">
-        <label for="birthday">Birthday</label>
-        <input
-          id="birthday"
-          type="date"
-          v-model="formData.birthday"
-          class="native-date"
-        />
-      </div>
-
-      <!-- Address -->
-      <div class="form-field">
-        <label for="address">Address</label>
-        <InputText
-          id="address"
-          v-model="formData.address"
-          placeholder="Enter student address (optional)"
-          class="form-input"
-        />
-      </div>
-
-      <!-- Average Score -->
-      <div class="form-field">
-        <label for="averageScore">Average Score</label>
-        <div class="score-wrapper">
-          <InputText
-            id="averageScore"
-            type="text"
-            inputmode="decimal"
-            v-model="formData.averageScore"
-            placeholder="0.0 - 10.0"
-            class="form-input"
-          />
-          <div class="score-indicator" v-if="formData.averageScore !== null && formData.averageScore !== ''">
-            <span :class="scoreClass(Number(formData.averageScore))">{{ Number(formData.averageScore).toFixed(1) }}</span>
+        <div class="academic-note">
+          <i class="pi pi-info-circle"></i>
+          <div>
+            <strong>Quy chuẩn đánh giá</strong>
+            <p>Điểm từ 8.5 trở lên được đánh dấu xuất sắc, dưới 5.5 cần theo dõi học vụ.</p>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="form-divider"></div>
-
-      <!-- Actions -->
-      <div class="form-actions">
-        <Button 
-          type="button" 
-          label="Back" 
-          severity="secondary" 
-          outlined
-          @click="$emit('back')" 
-          class="btn-back"
-        />
-        <Button 
-          type="submit" 
-          :label="mode === 'edit' ? 'Save Changes' : 'Create Student'" 
-          severity="primary" 
-          class="btn-save"
-        />
+    <section class="form-section">
+      <div class="form-section__title">
+        <i class="pi pi-map-marker"></i>
+        <div>
+          <h3>Thông tin liên hệ</h3>
+          <p>Địa chỉ hoặc ghi chú liên hệ phục vụ quản trị hồ sơ.</p>
+        </div>
       </div>
-    </form>
-  </div>
+
+      <label class="form-field">
+        <span>Địa chỉ</span>
+        <InputText v-model="formData.address" placeholder="Nhập địa chỉ liên hệ" />
+        <small>Thông tin này có thể cập nhật sau.</small>
+      </label>
+    </section>
+
+    <div class="student-form__actions">
+      <button class="app-button app-button--secondary" type="button" @click="$emit('back')">Hủy</button>
+      <button class="app-button app-button--primary" type="submit">
+        <i class="pi pi-check"></i>
+        {{ mode === 'edit' ? 'Lưu thay đổi' : 'Tạo sinh viên' }}
+      </button>
+    </div>
+  </form>
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 
 export interface StudentFormData {
   studentId: number | null
@@ -139,42 +141,69 @@ const emit = defineEmits<{
 }>()
 
 const formData = reactive<StudentFormData>({
-  studentId: null as number | null,
+  studentId: null,
   studentCode: '',
   studentName: '',
-  birthday: '', 
+  birthday: '',
   address: '',
-  averageScore: null as string | null
+  averageScore: null,
 })
 
-watch(() => props.initialData, (newVal) => {
-  if (!newVal) return
-  formData.studentId = newVal.studentId ?? formData.studentId
-  formData.studentCode = newVal.studentCode ?? formData.studentCode
-  formData.studentName = newVal.studentName ?? formData.studentName
-  formData.birthday = newVal.birthday ?? formData.birthday
-  formData.address = newVal.address ?? formData.address
-  formData.averageScore = newVal.averageScore != null ? String(newVal.averageScore) : formData.averageScore
-}, { immediate: true })
+const errors = reactive<Record<string, string>>({})
 
-function generateCode() {
-  emit('generateCode')
-}
+const scorePreview = computed(() => {
+  const value = formData.averageScore?.trim()
+  if (!value || Number.isNaN(Number(value))) return ''
+  return Number(value).toFixed(1)
+})
+
+watch(
+  () => props.initialData,
+  (newVal) => {
+    if (!newVal) return
+    formData.studentId = newVal.studentId ?? formData.studentId
+    formData.studentCode = newVal.studentCode ?? formData.studentCode
+    formData.studentName = newVal.studentName ?? formData.studentName
+    formData.birthday = newVal.birthday ?? formData.birthday
+    formData.address = newVal.address ?? formData.address
+    formData.averageScore = newVal.averageScore != null ? String(newVal.averageScore) : formData.averageScore
+  },
+  { immediate: true },
+)
 
 function scoreClass(score: number) {
-  if (score >= 8.5) return 'score--excellent'
-  if (score >= 7.0) return 'score--good'
-  if (score >= 5.5) return 'score--average'
-  return 'score--poor'
+  if (score >= 8.5) return 'score-preview--excellent'
+  if (score >= 7.0) return 'score-preview--good'
+  if (score >= 5.5) return 'score-preview--average'
+  return 'score-preview--poor'
+}
+
+function validateForm() {
+  Object.keys(errors).forEach((key) => delete errors[key])
+
+  if (!formData.studentName.trim()) {
+    errors.studentName = 'Vui lòng nhập họ tên sinh viên.'
+  }
+
+  if (!formData.birthday) {
+    errors.birthday = 'Vui lòng chọn ngày sinh.'
+  }
+
+  const scoreValue = formData.averageScore?.trim()
+  if (scoreValue) {
+    const score = Number(scoreValue)
+    if (Number.isNaN(score) || score < 0 || score > 10) {
+      errors.averageScore = 'Điểm trung bình phải nằm trong khoảng 0 đến 10.'
+    }
+  }
+
+  return Object.keys(errors).length === 0
 }
 
 function submitForm() {
+  if (!validateForm()) return
   const submitData = { ...formData }
-  
-  if (submitData.averageScore === '') {
-    submitData.averageScore = null
-  }
-
+  if (submitData.averageScore === '') submitData.averageScore = null
   emit('save', submitData)
 }
 
@@ -186,277 +215,259 @@ defineExpose({ setStudentCode })
 </script>
 
 <style scoped>
-.detail-card {
-  background: var(--color-surface-card);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card), 0 8px 32px rgba(30, 140, 134, 0.06);
-  overflow: hidden;
-  border: 1px solid var(--color-border-light);
-}
-
-.detail-card__header {
-  padding: var(--space-2xl) var(--space-3xl) var(--space-xl);
-  background: linear-gradient(to right, var(--color-primary-bg), var(--color-surface-card));
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.detail-card__title {
-  margin: 0 0 6px 0;
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-extrabold);
-  color: var(--color-text-primary);
-  letter-spacing: -0.01em;
-}
-
-.detail-card__subtitle {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.detail-form {
-  padding: var(--space-2xl) var(--space-3xl) var(--space-3xl);
+.student-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+}
+
+.student-form__header,
+.form-section,
+.student-form__actions {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.student-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+}
+
+.student-form__header span {
+  color: var(--color-primary-hover);
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.student-form__header h2 {
+  margin: 4px 0;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.student-form__header p,
+.form-section__title p,
+.form-field small,
+.academic-note p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.form-section {
+  padding: var(--space-xl);
+}
+
+.form-section__title {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.form-section__title > i {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-hover);
+  flex: 0 0 auto;
+}
+
+.form-section__title h3 {
+  margin: 0 0 2px;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+.form-grid--two {
+  grid-template-columns: minmax(0, 1fr) 360px;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  min-width: 0;
 }
 
-.form-field label {
-  font-size: 0.875rem;
+.form-field span {
+  color: var(--color-text);
+  font-size: 13px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
-/* Inputs use global PrimeVue overrides (cream bg, teal focus) */
+.form-field b {
+  color: var(--color-danger);
+}
+
+.field-error {
+  color: var(--color-danger) !important;
+  font-weight: var(--font-weight-semibold);
+}
+
+.is-invalid,
+:deep(.is-invalid.p-inputtext) {
+  border-color: var(--color-danger) !important;
+  background: var(--color-danger-soft) !important;
+}
 
 .input-with-action {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-md);
 }
 
-.input-with-action > :first-child {
-  flex: 1;
-}
-
-/* Generate Code button — Gold/Accent themed */
-.generate-btn {
-  height: 48px;
-  padding: 0 20px;
-  border-radius: var(--radius-round) !important;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: -0.01em;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark)) !important;
-  color: var(--color-text-primary) !important;
-  border: none !important;
-  transition: all var(--transition-bounce);
-  box-shadow: var(--shadow-accent-glow);
-}
-
-.generate-btn:hover {
-  background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent)) !important;
-  box-shadow: 0 4px 16px rgba(255, 210, 63, 0.5) !important;
-  transform: translateY(-1px);
-}
-
-.generate-btn:active {
-  transform: scale(0.95) !important;
-}
-
-/* Readonly box */
-.readonly-box {
+.readonly-box,
+.academic-note {
+  min-height: 42px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  background-color: var(--color-primary-bg);
-  border: 1.5px dashed rgba(43, 168, 162, 0.3);
+  gap: var(--space-md);
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-bold);
-  font-family: monospace;
-  font-size: 0.95rem;
-}
-
-.readonly-box i {
-  color: var(--color-text-muted);
 }
 
 .font-mono {
-  font-family: monospace;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.05em;
-  color: var(--color-primary-dark) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  color: var(--color-primary-hover) !important;
+  font-weight: var(--font-weight-bold) !important;
 }
 
-/* Score */
 .score-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
-.score-indicator {
+.score-wrapper :deep(.p-inputtext) {
+  padding-right: 82px !important;
+}
+
+.score-preview {
   position: absolute;
-  right: 12px;
-  pointer-events: none;
-}
-
-.score-indicator span {
-  display: inline-block;
-  padding: 4px 12px;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 54px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-round);
-  font-size: 0.8rem;
+  font-size: 12px;
   font-weight: var(--font-weight-bold);
 }
 
-.score--excellent {
-  background: rgba(39, 174, 96, 0.12);
-  color: #1a7a42;
-  border: 1px solid rgba(39, 174, 96, 0.25);
+.score-preview--excellent,
+.score-preview--good {
+  background: var(--color-success-soft);
+  color: #15803d;
 }
 
-.score--good {
-  background: rgba(93, 173, 226, 0.12);
-  color: #2471a3;
-  border: 1px solid rgba(93, 173, 226, 0.25);
+.score-preview--average {
+  background: var(--color-info-soft);
+  color: #2563eb;
 }
 
-.score--average {
-  background: rgba(255, 210, 63, 0.15);
-  color: #9a7d0a;
-  border: 1px solid rgba(255, 210, 63, 0.3);
+.score-preview--poor {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
-.score--poor {
-  background: rgba(239, 108, 74, 0.1);
-  color: var(--color-coral-dark);
-  border: 1px solid rgba(239, 108, 74, 0.25);
-}
-
-/* Divider */
-.form-divider {
-  height: 1px;
-  background-color: var(--color-border-light);
-  margin: var(--space-sm) 0;
-}
-
-/* Action buttons */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-lg);
-}
-
-.btn-back,
-.btn-save {
-  padding: 12px 28px;
-  border-radius: var(--radius-round);
-  font-weight: var(--font-weight-bold);
-  font-size: 0.95rem;
-  transition: all var(--transition-bounce);
-}
-
-.btn-back {
-  background-color: transparent;
-  color: var(--color-text-secondary);
-  border: 1.5px solid var(--color-border);
-}
-
-.btn-back:hover {
-  background-color: var(--color-primary-bg);
-  color: var(--color-primary-dark);
-  border-color: var(--color-primary-light);
-}
-
-.btn-back:active {
-  transform: scale(0.95);
-}
-
-/* Save — Gold gradient CTA */
-.btn-save {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-  color: var(--color-text-primary);
-  border: none;
-  box-shadow: var(--shadow-accent-glow);
-  letter-spacing: 0.02em;
-}
-
-.btn-save:hover {
-  background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent));
-  box-shadow: 0 4px 16px rgba(255, 210, 63, 0.5);
-  transform: translateY(-2px);
-}
-
-.btn-save:active {
-  transform: scale(0.95);
-  box-shadow: var(--shadow-accent-glow);
-}
-
-/* Native date input — styled to match design system */
 .native-date {
   width: 100%;
-  padding: 11px 16px;
-  border: 1.5px solid var(--color-border);
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-cream);
-  font-family: var(--font-family);
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
+  background: var(--color-surface);
+  color: var(--color-text);
   outline: none;
-  transition: all var(--transition-base);
-  -webkit-appearance: none;
-  appearance: none;
+  transition: all var(--transition-fast);
+}
+
+.native-date:hover {
+  border-color: var(--color-border-strong);
 }
 
 .native-date:focus {
-  background-color: var(--color-surface-card);
   border-color: var(--color-primary);
   box-shadow: var(--shadow-focus);
 }
 
-.native-date:hover {
-  border-color: var(--color-primary-light);
+.academic-note {
+  align-items: flex-start;
+  min-height: 100%;
+  padding: var(--space-lg);
+  background: var(--color-background);
+  font-weight: var(--font-weight-normal);
 }
 
-.native-date::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.5;
-  transition: opacity 0.2s;
+.academic-note i {
+  margin-top: 2px;
+  color: var(--color-primary-hover);
 }
 
-.native-date::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+.academic-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  font-size: 13px;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .detail-card__header,
-  .detail-form {
-    padding-left: var(--space-xl);
-    padding-right: var(--space-xl);
+.student-form__actions {
+  position: sticky;
+  bottom: var(--space-lg);
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+}
+
+@media (max-width: 900px) {
+  .form-grid,
+  .form-grid--two {
+    grid-template-columns: 1fr;
   }
+}
 
-  .input-with-action {
+@media (max-width: 640px) {
+  .student-form__header {
+    align-items: stretch;
     flex-direction: column;
   }
 
-  .form-actions {
+  .input-with-action {
+    grid-template-columns: 1fr;
+  }
+
+  .student-form__actions {
+    position: static;
     flex-direction: column-reverse;
   }
 
-  .btn-back,
-  .btn-save {
+  .student-form__actions .app-button,
+  .student-form__header .app-button {
     width: 100%;
-    justify-content: center;
   }
 }
 </style>

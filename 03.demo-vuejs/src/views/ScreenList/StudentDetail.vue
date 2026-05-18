@@ -1,29 +1,25 @@
 <template>
-  <div class="student-detail">
-    <AppHeader
-      :show-username="mode === 'edit'"
+  <DashboardLayout
+    :title="mode === 'edit' ? 'Cập nhật sinh viên' : 'Thêm sinh viên'"
+    breadcrumb="Sinh viên"
+    :subtitle="mode === 'edit' ? 'Cập nhật thông tin học tập và liên hệ của hồ sơ hiện có.' : 'Tạo hồ sơ sinh viên mới với mã sinh viên được sinh tự động.'"
+  >
+    <StudentDetailForm
+      ref="formRef"
+      :mode="mode"
+      :initial-data="initialData"
+      @save="handleSave"
+      @back="handleBack"
+      @generateCode="generateCode"
     />
-
-    <main class="student-detail__main">
-      <div class="student-detail__container">
-        <StudentDetailForm
-          ref="formRef"
-          :mode="mode"
-          :initial-data="initialData"
-          @save="handleSave"
-          @back="handleBack"
-          @generateCode="generateCode"
-        />
-      </div>
-    </main>
-  </div>
-  <ToastNotification ref="toast" />
+    <ToastNotification ref="toast" />
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import AppHeader from '../../components/screenList/Header.vue'
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import StudentDetailForm, { type StudentFormData } from '../../components/screenList/StudentDetailForm.vue'
 import ToastNotification from '../../components/screenList/ToastNotification.vue'
 import {
@@ -127,32 +123,10 @@ function handleBack() {
 }
 
 function normalizeAverageScore(value: string | null): number | null {
-  if (value == null) {
-    return null
-  }
-
+  if (value == null) return null
   const trimmed = value.trim()
-  if (!trimmed) {
-    return null
-  }
-
+  if (!trimmed) return null
   const score = Number(trimmed)
   return Number.isNaN(score) ? null : score
 }
 </script>
-
-<style scoped>
-.student-detail {
-  min-height: 100vh;
-  background: var(--color-surface-base);
-}
-
-.student-detail__main {
-  padding: var(--space-3xl) var(--space-xl) var(--space-4xl);
-}
-
-.student-detail__container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-</style>

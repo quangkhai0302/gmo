@@ -21,7 +21,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-interface Toast { id: number; message: string; type: 'success' | 'error' }
+interface Toast {
+  id: number
+  message: string
+  type: 'success' | 'error'
+}
 
 const toasts = ref<Toast[]>([])
 let nextId = 0
@@ -33,7 +37,9 @@ function toastTitle(type: Toast['type']) {
 function show(message: string, type: 'success' | 'error' = 'success', duration = 3000) {
   const id = ++nextId
   toasts.value.push({ id, message, type })
-  setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id) }, duration)
+  setTimeout(() => {
+    toasts.value = toasts.value.filter((toast) => toast.id !== id)
+  }, duration)
 }
 
 defineExpose({ show })
@@ -42,31 +48,30 @@ defineExpose({ show })
 <style scoped>
 .toast-container {
   position: fixed;
-  top: 72px;
+  top: 88px;
   right: 20px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
   pointer-events: none;
 }
 
 .toast-item {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  max-width: 380px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
-  pointer-events: all;
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-light);
-  position: relative;
+  gap: var(--space-md);
+  width: min(380px, calc(100vw - 32px));
+  padding: var(--space-md) var(--space-lg);
   overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  pointer-events: all;
 }
 
-/* Left accent bar */
 .toast-item::after {
   content: '';
   position: absolute;
@@ -74,45 +79,36 @@ defineExpose({ show })
   top: 0;
   width: 4px;
   height: 100%;
-  border-radius: 0 2px 2px 0;
 }
 
 .toast-item__icon-wrap {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-round);
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  font-size: 0.95rem;
+  border-radius: var(--radius-round);
+  flex: 0 0 auto;
+  font-size: 16px;
 }
 
 .toast-item__content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  min-width: 0;
 }
 
 .toast-item__title {
   margin: 0;
-  font-size: 0.82rem;
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
 }
 
 .toast-item__message {
-  margin: 0;
-  font-size: 0.88rem;
+  margin: 2px 0 0;
+  color: var(--color-text);
+  font-size: 14px;
   font-weight: var(--font-weight-semibold);
-  line-height: 1.35;
-}
-
-/* Success — Teal themed */
-.toast-item--success {
-  background: linear-gradient(180deg, #ffffff 0%, #f0faf9 100%);
-  color: var(--color-primary-dark);
+  line-height: 1.4;
 }
 
 .toast-item--success::after {
@@ -120,46 +116,35 @@ defineExpose({ show })
 }
 
 .toast-item--success .toast-item__icon-wrap {
-  background: rgba(39, 174, 96, 0.12);
-  color: var(--color-success);
+  background: var(--color-success-soft);
+  color: #15803d;
 }
 
 .toast-item--success .toast-item__title {
-  color: var(--color-primary-dark);
-}
-
-/* Error — Coral themed */
-.toast-item--error {
-  background: linear-gradient(180deg, #ffffff 0%, #fef6f4 100%);
-  color: var(--color-coral-dark);
+  color: #15803d;
 }
 
 .toast-item--error::after {
-  background: var(--color-coral);
+  background: var(--color-danger);
 }
 
 .toast-item--error .toast-item__icon-wrap {
-  background: rgba(239, 108, 74, 0.1);
-  color: var(--color-coral);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .toast-item--error .toast-item__title {
-  color: var(--color-coral-dark);
+  color: var(--color-danger);
 }
 
-/* Transition */
 .toast-enter-active,
 .toast-leave-active {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all var(--transition-base);
 }
 
-.toast-enter-from {
-  opacity: 0;
-  transform: translateX(40px);
-}
-
+.toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(40px);
+  transform: translateX(28px);
 }
 </style>

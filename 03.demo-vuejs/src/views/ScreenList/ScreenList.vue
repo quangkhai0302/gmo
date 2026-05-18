@@ -1,47 +1,60 @@
 <template>
-  <div class="screen-list">
-    <AppHeader />
+  <DashboardLayout
+    title="Sinh viên"
+    breadcrumb="Sinh viên"
+    eyebrow="Student Records"
+    subtitle="Quản lý hồ sơ sinh viên, tìm kiếm, sắp xếp, xuất dữ liệu và thao tác nhanh trên từng bản ghi."
+  >
+    <template #actions>
+      <button class="app-button app-button--secondary" :disabled="exportingCsv" @click="handleExportCsv">
+        <i :class="exportingCsv ? 'pi pi-spin pi-spinner' : 'pi pi-download'"></i>
+        {{ exportingCsv ? 'Đang xuất' : 'Xuất CSV' }}
+      </button>
+      <button class="app-button app-button--primary" @click="handleAddStudent">
+        <i class="pi pi-plus"></i>
+        Thêm sinh viên
+      </button>
+    </template>
 
-    <main class="screen-list__main">
-      <div class="screen-list__container">
-        <SearchForm @search="handleSearch" />
+    <SearchForm @search="handleSearch" @reset="handleResetSearch" />
 
-        <div class="table-card">
-          <div class="table-card__header">
-            <div class="table-card__title">
-              <i class="pi pi-th-large"></i>
-              Student List
-            </div>
-            <div class="table-card__actions">
-              <button class="btn-export" :disabled="exportingCsv" @click="handleExportCsv">
-                <i class="pi pi-download"></i>
-                {{ exportingCsv ? 'Exporting...' : 'Export CSV' }}
-              </button>
-              <button class="btn-add" @click="handleAddStudent">
-                <i class="pi pi-plus"></i>
-                Add Student
-              </button>
-            </div>
+    <section class="student-card">
+      <div class="student-card__header">
+        <div>
+          <h2>Danh sách sinh viên</h2>
+          <p>{{ filteredTotal }} hồ sơ trong hệ thống</p>
+        </div>
+
+        <div class="student-card__actions">
+          <div v-if="selectedIds.length" class="bulk-bar">
+            <span>{{ selectedIds.length }} đã chọn</span>
+            <button type="button" @click="selectedIds = []">Bỏ chọn</button>
           </div>
-
-          <StudentTable
-            :students="pagedStudents"
-            :sort="sortState"
-            :start-index="startIndex"
-            @sort="handleSort"
-            @requestEdit="handleRequestEdit"
-            @requestDelete="openDeleteDialog"
-          />
-
-          <Pagination
-            :current-page="currentPage"
-            :total-items="filteredTotal"
-            :page-size="PAGE_SIZE"
-            @changePage="handlePageChange"
-          />
+          <button class="icon-action" type="button" title="Làm mới" @click="fetchStudents(currentPage)">
+            <i class="pi pi-refresh"></i>
+          </button>
         </div>
       </div>
-    </main>
+
+      <StudentTable
+        :students="pagedStudents"
+        :sort="sortState"
+        :start-index="startIndex"
+        :loading="loading"
+        :selected-ids="selectedIds"
+        @sort="handleSort"
+        @selectionChange="selectedIds = $event"
+        @requestEdit="handleRequestEdit"
+        @requestDelete="openDeleteDialog"
+      />
+
+      <Pagination
+        :current-page="currentPage"
+        :total-items="filteredTotal"
+        :page-size="PAGE_SIZE"
+        @changePage="handlePageChange"
+      />
+    </section>
 
     <ConfirmDialog
       :visible="dialog.visible"
@@ -51,16 +64,16 @@
     />
 
     <ToastNotification ref="toast" />
-  </div>
+  </DashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { deleteStudentApi, getStudentsApi, runStudentExportBatchApi } from '@/api/axios'
 import { parseApiError } from '@/utils/apiError'
 import type { SearchForm as ISearchForm, SortState, Student, StudentSortField } from '../../types/student'
-import AppHeader from '../../components/screenList/Header.vue'
 import ConfirmDialog from '../../components/screenList/ConfirmDialog.vue'
 import Pagination from '../../components/screenList/Pagination.vue'
 import SearchForm from '../../components/screenList/SearchForm.vue'
@@ -76,6 +89,8 @@ const currentPage = ref(1)
 const filteredTotal = ref(0)
 const toast = ref<InstanceType<typeof ToastNotification> | null>(null)
 const exportingCsv = ref(false)
+const loading = ref(false)
+const selectedIds = ref<number[]>([])
 
 const searchCriteria = reactive<ISearchForm>({ code: '', name: '', birthday: '' })
 const sortState = reactive<SortState>({ field: null, order: null })
@@ -89,19 +104,25 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 async function fetchStudents(page = currentPage.value) {
-  const response = await getStudentsApi({
-    studentCode: searchCriteria.code.trim() || undefined,
-    studentName: searchCriteria.name.trim() || undefined,
-    birthday: searchCriteria.birthday.trim() || undefined,
-    page,
-    size: PAGE_SIZE,
-    sortField: sortState.field ?? undefined,
-    sortOrder: sortState.order ?? undefined,
-  })
+  loading.value = true
+  try {
+    const response = await getStudentsApi({
+      studentCode: searchCriteria.code.trim() || undefined,
+      studentName: searchCriteria.name.trim() || undefined,
+      birthday: searchCriteria.birthday.trim() || undefined,
+      page,
+      size: PAGE_SIZE,
+      sortField: sortState.field ?? undefined,
+      sortOrder: sortState.order ?? undefined,
+    })
 
-  students.value = response.result.items
-  currentPage.value = response.result.page
-  filteredTotal.value = response.result.totalItems
+    students.value = response.result.items
+    currentPage.value = response.result.page
+    filteredTotal.value = response.result.totalItems
+    selectedIds.value = []
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(async () => {
@@ -119,6 +140,15 @@ async function handleSearch(form: ISearchForm) {
     await fetchStudents(1)
   } catch (error) {
     toast.value?.show(getErrorMessage(error, 'Tìm kiếm thất bại'), 'error')
+  }
+}
+
+async function handleResetSearch() {
+  try {
+    Object.assign(searchCriteria, { code: '', name: '', birthday: '' })
+    await fetchStudents(1)
+  } catch (error) {
+    toast.value?.show(getErrorMessage(error, 'Không thể làm mới bộ lọc'), 'error')
   }
 }
 
@@ -185,9 +215,7 @@ function handleRequestEdit(id: number) {
 }
 
 async function handleExportCsv() {
-  if (exportingCsv.value) {
-    return
-  }
+  if (exportingCsv.value) return
 
   try {
     exportingCsv.value = true
@@ -215,144 +243,99 @@ function showToastFromRouteQuery() {
 }
 
 function extractFileName(path: string) {
-  if (!path) {
-    return 'student_export.csv'
-  }
-
+  if (!path) return 'student_export.csv'
   const normalized = path.replace(/\\/g, '/')
   const parts = normalized.split('/')
-  const fileName = parts[parts.length - 1]
-  return fileName || 'student_export.csv'
+  return parts[parts.length - 1] || 'student_export.csv'
 }
 </script>
 
 <style scoped>
-.screen-list {
-  min-height: 100vh;
-}
-
-.screen-list__main {
-  padding: var(--space-xl) var(--space-xl) var(--space-4xl);
-}
-
-.screen-list__container {
-  max-width: 1280px;
-  margin: 0 auto;
-}
-
-/* ── Table Card ── */
-.table-card {
-  background: var(--color-surface-card);
-  border-radius: var(--radius-lg);
+.student-card {
   overflow: hidden;
-  box-shadow: var(--shadow-card), 0 8px 32px rgba(30, 140, 134, 0.06);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
-.table-card__header {
+.student-card__header {
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-lg);
   padding: var(--space-lg) var(--space-xl);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.table-card__title {
+.student-card__header h2 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.student-card__header p {
+  margin: 3px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.student-card__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
+  gap: var(--space-md);
+}
+
+.bulk-bar {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 var(--space-md);
+  border: 1px solid rgba(20, 184, 166, 0.24);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-hover);
+  font-size: 13px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
 }
 
-.table-card__title i {
-  color: var(--color-primary);
-}
-
-.table-card__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* ── Add Student Button — Teal pill ── */
-.btn-add {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: var(--color-text-on-primary);
-  border: none;
-  padding: 9px 20px;
-  border-radius: var(--radius-round);
-  font-size: 0.85rem;
-  font-weight: var(--font-weight-semibold);
+.bulk-bar button {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary-hover);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  box-shadow: var(--shadow-teal-glow);
-  transition: all var(--transition-bounce);
-  font-family: var(--font-family);
-  letter-spacing: 0.01em;
 }
 
-.btn-add:hover {
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(43, 168, 162, 0.4);
-}
-
-.btn-add:active {
-  transform: scale(0.95);
-}
-
-/* ── Export CSV Button — Gold accent ── */
-.btn-export {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 210, 63, 0.12);
-  color: var(--color-accent-dark);
-  border: 1.5px solid rgba(255, 210, 63, 0.3);
-  padding: 9px 20px;
-  border-radius: var(--radius-round);
-  font-size: 0.85rem;
-  font-weight: var(--font-weight-semibold);
+.icon-action {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all var(--transition-bounce);
-  font-family: var(--font-family);
+  transition: all var(--transition-fast);
 }
 
-.btn-export:hover:not(:disabled) {
-  background: rgba(255, 210, 63, 0.2);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-accent-glow);
+.icon-action:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
 }
 
-.btn-export:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Responsive */
 @media (max-width: 640px) {
-  .screen-list__main {
-    padding: var(--space-lg) var(--space-lg) var(--space-3xl);
-  }
-
-  .table-card__header {
-    flex-direction: column;
-    gap: var(--space-md);
+  .student-card__header {
     align-items: flex-start;
+    flex-direction: column;
   }
 
-  .table-card__actions {
+  .student-card__actions,
+  .bulk-bar {
     width: 100%;
-  }
-
-  .btn-add,
-  .btn-export {
-    flex: 1;
-    justify-content: center;
+    justify-content: space-between;
   }
 }
 </style>
